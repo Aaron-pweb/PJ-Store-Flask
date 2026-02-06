@@ -1,9 +1,9 @@
 Bootstrap_Flask==2.5.0
-# Flask_CKEditor==1.0.0  # Optional: Remove if not needed
+# Flask_CKEditor==1.0.0 
 Flask_Login==0.6.3
 Flask_WTF==1.2.2
 WTForms==3.2.1
-# Werkzeug==3.1.5  # Optional: Remove pin unless required
+# Werkzeug==3.1.5 
 Flask==3.1.2
 flask_sqlalchemy==3.1.1
 SQLAlchemy==2.0.46
@@ -11,3 +11,5 @@ gunicorn==25.0.0
 psycopg2-binary==2.9.11
 stripe==14.3.0
 python-dotenv==1.2.1
+requests
+email_validator

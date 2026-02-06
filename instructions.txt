@@ -1,12 +1,12 @@
-PJ-STORE-FLASK/ Project structure 
-├── .env
+PJ-STORE-FLASK/
+├── .env                  # Secrets (DB URI, Secret Key, CHAPA_SECRET_KEY)
 ├── .gitignore
-├── requirements.txt
+├── requirements.txt      # Added requests
 ├── run.py
 ├── instance/
 │   └── site.db
 └── app/
-    ├── __init__.py
+    ├── __init__.py       # Registers payments_bp
     ├── extensions.py
     ├── static/
     │   ├── css/
@@ -26,6 +26,10 @@ PJ-STORE-FLASK/ Project structure
     │   ├── routes.py
     │   ├── forms.py
     │   └── models.py
-    └── main/
+    ├── main/
         ├── __init__.py
         └── routes.py
+    └── payments/         # NEW MODULE
+        ├── __init__.py
+        ├── routes.py     # /pay, /callback, /webhook
+        └── utils.py      # Chapa API logic

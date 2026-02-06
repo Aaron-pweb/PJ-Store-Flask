@@ -1,7 +1,16 @@
-from wtforms import Form, StringField, PasswordField, IntegerField, validators
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, IntegerField, BooleanField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
 
-class UserForm(Form):
-    full_name = StringField("name", validators=[validators.Length(max=10)])
-    user_age = IntegerField("age", validators=[validators.DataRequired()])
-    email = StringField("email", validators=[validators.Length(max=10)])
-    password = PasswordField("password", validators=[validators.Length(max=10)])
+class UserForm(FlaskForm):
+    full_name = StringField("Full Name", validators=[DataRequired(), Length(max=100)])
+    user_name = StringField("Username", validators=[DataRequired(), Length(max=100)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    user_age = IntegerField("Age", validators=[DataRequired(), NumberRange(min=18, max=100)])
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password')])
+
+class LoginForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    remember = BooleanField("Remember Me")

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PJ-STORE-FLASK{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 text-center container">
+    <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">Welcome to PJ-STORE</h1>
+            <p class="lead text-muted">Discover the best products at unbeatable prices. Shop the latest trends and
+                essential items delivered straight to your door.</p>
+            <p>
+                <a href="{{ url_for('products.catalog') }}" class="btn btn-primary my-2">Shop Now</a>
+                <a href="#" class="btn btn-secondary my-2">Learn More</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-light">Featured Products</h2>
+            <a href="{{ url_for('products.catalog') }}" class="text-decoration-none">View All</a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <!-- Example Featured Product 1 -->
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
+                        preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c" /><text x="50%" y="50%" fill="#eceeef"
+                            dy=".3em">Thumbnail</text>
+                    </svg>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Featured Product 1</h5>
+                        <p class="card-text text-muted flex-grow-1">High quality product description goes here.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="btn-group">
+                                <a href="{{ url_for('products.detail', id=1) }}"
+                                    class="btn btn-sm btn-outline-secondary">View</a>
+                                <button type="button" class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                            </div>
+                            <small class="text-muted">$29.99</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Featured Product 2 -->
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
+                        preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c" /><text x="50%" y="50%" fill="#eceeef"
+                            dy=".3em">Thumbnail</text>
+                    </svg>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Featured Product 2</h5>
+                        <p class="card-text text-muted flex-grow-1">Another great item you can't miss.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="btn-group">
+                                <a href="{{ url_for('products.detail', id=2) }}"
+                                    class="btn btn-sm btn-outline-secondary">View</a>
+                                <button type="button" class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                            </div>
+                            <small class="text-muted">$49.99</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Featured Product 3 -->
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
+                        preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c" /><text x="50%" y="50%" fill="#eceeef"
+                            dy=".3em">Thumbnail</text>
+                    </svg>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Featured Product 3</h5>
+                        <p class="card-text text-muted flex-grow-1">Top rated and ready to ship.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="btn-group">
+                                <a href="{{ url_for('products.detail', id=3) }}"
+                                    class="btn btn-sm btn-outline-secondary">View</a>
+                                <button type="button" class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                            </div>
+                            <small class="text-muted">$19.99</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

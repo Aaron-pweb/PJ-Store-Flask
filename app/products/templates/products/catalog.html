@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Catalog - PJ-STORE-FLASK{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar / Filter (Optional but good structure) -->
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Categories</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="#" class="text-decoration-none text-dark">Electronics</a>
+                    <span class="badge bg-secondary rounded-pill">12</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="#" class="text-decoration-none text-dark">Clothing</a>
+                    <span class="badge bg-secondary rounded-pill">8</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="#" class="text-decoration-none text-dark">Home & Garden</a>
+                    <span class="badge bg-secondary rounded-pill">5</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>All Products</h2>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Sort by
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                    <li><a class="dropdown-item" href="#">Price: Low to High</a></li>
+                    <li><a class="dropdown-item" href="#">Price: High to Low</a></li>
+                    <li><a class="dropdown-item" href="#">Newest</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <!-- Loop through products here. Using placeholders for template. -->
+            {% for i in range(1, 7) %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 product-card">
+                    <div class="position-relative">
+                        <img src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" class="card-img-top"
+                            alt="Product Image">
+                        {% if i % 2 == 0 %}
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">Sale</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate">Product Title {{ i }}</h5>
+                        <p class="card-text small text-muted">Brief description of the product features goes here.</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="h5 mb-0">${{ 19.99 + (i * 10) }}</span>
+                                <small class="text-decoration-line-through text-muted">${{ 29.99 + (i * 10) }}</small>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('products.detail', id=i) }}" class="btn btn-outline-primary">View
+                                    Details</a>
+                                <button class="btn btn-primary"><i class="fas fa-cart-plus me-1"></i> Add to
+                                    Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
