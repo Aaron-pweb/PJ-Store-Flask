@@ -1,0 +1,31 @@
+PJ-STORE-FLASK/ Project structure 
+├── .env
+├── .gitignore
+├── requirements.txt
+├── run.py
+├── instance/
+│   └── site.db
+└── app/
+    ├── __init__.py
+    ├── extensions.py
+    ├── static/
+    │   ├── css/
+    │   └── img/
+    ├── templates/
+    │   ├── base.html
+    │   ├── index.html
+    │   ├── login.html
+    │   └── register.html
+    ├── auth/
+    │   ├── __init__.py
+    │   ├── routes.py
+    │   ├── forms.py
+    │   └── models.py
+    ├── products/
+    │   ├── __init__.py
+    │   ├── routes.py
+    │   ├── forms.py
+    │   └── models.py
+    └── main/
+        ├── __init__.py
+        └── routes.py
