@@ -25,7 +25,7 @@
             <div class="card bg-primary text-white h-100">
                 <div class="card-body">
                     <h5 class="card-title">Total Users</h5>
-                    <h2 class="display-6">-</h2>
+                    <h2 class="display-6">{{ total_users }}</h2>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
             <div class="card bg-success text-white h-100">
                 <div class="card-body">
                     <h5 class="card-title">Total Orders</h5>
-                    <h2 class="display-6">-</h2>
+                    <h2 class="display-6">{{ total_orders }}</h2>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="card bg-danger text-white h-100">
                 <div class="card-body">
                     <h5 class="card-title">Issues</h5>
-                    <h2 class="display-6">0</h2>
+                    <h2 class="display-6">{{ issues_count }}</h2>
                 </div>
             </div>
         </div>
@@ -72,10 +72,13 @@
                             <td>{{ seller.user_name }}</td>
                             <td>{{ seller.email }}</td>
                             <td>
-                                <a href="{{ url_for('auth.approve_seller', user_id=seller.id) }}"
-                                    class="btn btn-sm btn-success">
-                                    <i class="fas fa-check me-1"></i> Approve
-                                </a>
+                                <form action="{{ url_for('auth.approve_seller', user_id=seller.id) }}" method="POST"
+                                    style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="fas fa-check me-1"></i> Approve
+                                    </button>
+                                </form>
                                 <!-- Could add reject logic later -->
                             </td>
                         </tr>
@@ -92,13 +95,14 @@
 
     <!-- Quick Actions -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-header">Management</div>
+                <div class="card-header">System Management</div>
                 <div class="card-body">
-                    <a href="#" class="btn btn-outline-primary mb-2">Manage Users</a>
-                    <a href="#" class="btn btn-outline-primary mb-2">Manage Categories</a>
-                    <a href="#" class="btn btn-outline-primary mb-2">Refund Orders</a>
+                    <a href="{{ url_for('auth.manage_users') }}" class="btn btn-outline-primary mb-2">Manage Users</a>
+                    <a href="#" class="btn btn-outline-secondary mb-2">Manage Categories (ToDo)</a>
+                    <a href="#" class="btn btn-outline-danger mb-2">Refund Orders (ToDo)</a>
+                    <a href="{{ url_for('auth.view_logs') }}" class="btn btn-dark mb-2">View Server Logs</a>
                 </div>
             </div>
         </div>
