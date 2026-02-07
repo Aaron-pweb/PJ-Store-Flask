@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group mb-4">
+                <a href="#" class="list-group-item list-group-item-action active">Dashboard</a>
+                <a href="#" class="list-group-item list-group-item-action">My Orders</a>
+                <a href="#" class="list-group-item list-group-item-action">Addresses</a>
+                <a href="#" class="list-group-item list-group-item-action">Account Details</a>
+                <a href="{{ url_for('auth.logout') }}"
+                    class="list-group-item list-group-item-action text-danger">Logout</a>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <h2 class="mb-4">Hello, {{ current_user.full_name }}!</h2>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <p class="card-text">From your account dashboard you can view your <a href="#">recent orders</a>,
+                        manage your <a href="#">shipping and billing addresses</a>, and <a href="#">edit your password
+                            and account details</a>.</p>
+                </div>
+            </div>
+
+            <h3 class="mt-4 mb-3">Recent Orders</h3>
+            <div class="alert alert-info">
+                You haven't placed any orders yet. <a href="{{ url_for('products.catalog') }}">Start Shopping!</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

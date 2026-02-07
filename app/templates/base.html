@@ -1,121 +1,156 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}PJ-STORE-FLASK{% endblock %}</title>
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS (Optional, but good practice to include hook) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        main {
-            flex: 1;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .footer {
-            background-color: #f8f9fa;
-            padding: 2rem 0;
-            margin-top: auto;
-        }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-      <div class="container">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">PJ-STORE</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <!-- Search Bar -->
-          <form class="d-flex mx-auto col-lg-5" role="search" action="{{ url_for('products.catalog') }}" method="get">
-            <input class="form-control me-2 rounded-pill" type="search" placeholder="Search products..." aria-label="Search" name="q">
-            <button class="btn btn-outline-success rounded-pill" type="submit"><i class="fas fa-search"></i></button>
-          </form>
-          
-          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('products.catalog') }}">Products</a>
-            </li>
-            <li class="nav-item me-2">
-              <a class="nav-link position-relative" href="#">
-                <i class="fas fa-shopping-cart fa-lg"></i>
-                <!-- Badge count - Placeholder logic, assuming cart_count in context usually, taking safe default -->
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  0
-                  <span class="visually-hidden">items in cart</span>
-                </span>
-              </a>
-            </li>
-            
-            {% if current_user.is_authenticated %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user-circle fa-lg"></i> {{ current_user.username }}
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Logout</a></li>
-              </ul>
-            </li>
-            {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="btn btn-primary rounded-pill ms-2" href="{{ url_for('auth.signup') }}">Register</a>
-            </li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </nav>
 
-    <!-- Flash Messages -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PJ-STORE-FLASK{% endblock %}</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS (Optional, but good practice to include hook) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* .footer background handled by utility class now */
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top shadow-sm bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">PJ-STORE</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- Search Bar -->
+        <form class="d-flex mx-auto col-lg-5" role="search" action="{{ url_for('products.catalog') }}" method="get">
+          <input class="form-control me-2 rounded-pill" type="search" placeholder="Search products..."
+            aria-label="Search" name="q">
+          <button class="btn btn-outline-success rounded-pill" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('products.catalog') }}">Products</a>
+          </li>
+          {% if current_user.is_authenticated %}
+          <li class="nav-item me-2">
+            <a class="nav-link position-relative" href="#">
+              <i class="fas fa-shopping-cart fa-lg"></i>
+              <!-- Badge count - Placeholder logic -->
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                0
+                <span class="visually-hidden">items in cart</span>
+              </span>
+            </a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user-circle fa-lg"></i> {{ current_user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Logout</a></li>
+            </ul>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary rounded-pill ms-2" href="{{ url_for('auth.signup') }}">Register</a>
+          </li>
           {% endif %}
-        {% endwith %}
+
+
+          <!-- Theme Switcher (Public) -->
+          <li class="nav-item dropdown ms-2">
+            <button class="btn btn-link nav-link dropdown-toggle py-2 px-0 px-lg-2" id="bd-theme" type="button"
+              aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static">
+              <span class="theme-icon-active"><i class="fas fa-circle-half-stroke"></i></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
+                  <i class="fas fa-sun me-2"></i> Light
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+                  <i class="fas fa-moon me-2"></i> Dark
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto">
+                  <i class="fas fa-circle-half-stroke me-2"></i> Auto
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <!-- Main Content -->
-    <main class="container my-4">
-        {% block content %}{% endblock %}
-    </main>
+  <!-- Flash Messages -->
+  <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show"
+      role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+  </div>
 
-    <!-- Footer -->
-    <footer class="footer text-center text-lg-start">
-        <div class="container text-center">
-            <p class="text-muted mb-0">&copy; {{ now.year if now else '2024' }} PJ-STORE-FLASK. All rights reserved.</p>
-            <small class="text-muted"><a href="#" class="text-decoration-none text-muted">Privacy Policy</a> | <a href="#" class="text-decoration-none text-muted">Terms of Service</a></small>
-        </div>
-    </footer>
+  <!-- Main Content -->
+  <main class="container my-4">
+    {% block content %}{% endblock %}
+  </main>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
-  </body>
+  <!-- Footer -->
+  <footer class="footer text-center text-lg-start bg-body-tertiary py-4 mt-auto">
+    <div class="container text-center">
+      <p class="text-muted mb-0">&copy; {{ now.year if now else '2024' }} PJ-STORE-FLASK. All rights reserved.</p>
+      <small class="text-muted"><a href="#" class="text-decoration-none text-muted">Privacy Policy</a> | <a href="#"
+          class="text-decoration-none text-muted">Terms of Service</a></small>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
 </html>

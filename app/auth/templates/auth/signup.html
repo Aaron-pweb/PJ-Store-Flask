@@ -20,6 +20,15 @@
                         {% endfor %}
                     </div>
 
+                    <!-- Account Type -->
+                    <div class="mb-3">
+                        {{ form.account_type.label(class="form-label") }}
+                        {{ form.account_type(class="form-select") }}
+                        {% for error in form.account_type.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
                     <!-- Username -->
                     <div class="mb-3">
                         {{ form.user_name.label(class="form-label") }}

@@ -6,7 +6,8 @@ class User(db.Model, UserMixin):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(150), nullable=False)
-    is_end_user = db.Column(db.String, nullable=True)
+    role = db.Column(db.String(20), nullable=False, default='customer') # super_admin, admin, seller, support, customer
+    is_approved = db.Column(db.Boolean, default=True) # False for Sellers until approved
     user_name = db.Column(db.String(150), nullable=False, unique=True)
     age = db.Column(db.Integer, nullable=True)
     email = db.Column(db.String, nullable=False, unique=True)

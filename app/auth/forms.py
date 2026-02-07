@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, IntegerField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
 
 class UserForm(FlaskForm):
     full_name = StringField("Full Name", validators=[DataRequired(), Length(max=100)])
+    account_type = SelectField("Account Type", choices=[('customer', 'Customer'), ('seller', 'Seller / Vendor')], validators=[DataRequired()])
     user_name = StringField("Username", validators=[DataRequired(), Length(max=100)])
     email = StringField("Email", validators=[DataRequired(), Email()])
     user_age = IntegerField("Age", validators=[DataRequired(), NumberRange(min=18, max=100)])
