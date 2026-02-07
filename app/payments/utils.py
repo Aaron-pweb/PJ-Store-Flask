@@ -1,7 +1,7 @@
 import requests
 import os
 
-def initiate_chapa_payment(amount, email, first_name, last_name, tx_ref):
+def initiate_chapa_payment(amount, email, first_name, last_name, tx_ref, return_url=None, callback_url=None):
     url = "https://api.chapa.co/v1/transaction/initialize"
     payload = {
         "amount": amount,
@@ -10,8 +10,8 @@ def initiate_chapa_payment(amount, email, first_name, last_name, tx_ref):
         "first_name": first_name,
         "last_name": last_name,
         "tx_ref": tx_ref,
-        "callback_url": "https://your-website.com/payments/callback", # Update with actual domain
-        "return_url": "https://your-website.com/payments/success",
+        "callback_url": callback_url or "https://your-website.com/payments/callback",
+        "return_url": return_url or "https://your-website.com/payments/success",
         "customization[title]": "Payment for Order",
         "customization[description]": "I love paying with Chapa"
     }

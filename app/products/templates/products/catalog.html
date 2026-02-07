@@ -45,30 +45,29 @@
         </div>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-            <!-- Loop through products here. Using placeholders for template. -->
-            {% for i in range(1, 7) %}
+            <!-- Loop through products here. -->
+            {% for product in products %}
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 product-card">
                     <div class="position-relative">
                         <img src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" class="card-img-top"
-                            alt="Product Image">
-                        {% if i % 2 == 0 %}
-                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">Sale</span>
-                        {% endif %}
+                            alt="{{ product.name }}">
                     </div>
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-truncate">Product Title {{ i }}</h5>
-                        <p class="card-text small text-muted">Brief description of the product features goes here.</p>
+                        <h5 class="card-title text-truncate">{{ product.name }}</h5>
+                        <p class="card-text small text-muted">{{ product.description[:100] }}...</p>
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="h5 mb-0">${{ 19.99 + (i * 10) }}</span>
-                                <small class="text-decoration-line-through text-muted">${{ 29.99 + (i * 10) }}</small>
+                                <span class="h5 mb-0">${{ product.price }}</span>
+                                <small class="text-muted">{{ product.stock }} left</small>
                             </div>
                             <div class="d-grid gap-2">
-                                <a href="{{ url_for('products.detail', id=i) }}" class="btn btn-outline-primary">View
+                                <a href="{{ url_for('products.detail', id=product.id) }}"
+                                    class="btn btn-outline-primary">View
                                     Details</a>
-                                <button class="btn btn-primary"><i class="fas fa-cart-plus me-1"></i> Add to
-                                    Cart</button>
+                                <a href="{{ url_for('orders.add_to_cart', product_id=product.id) }}"
+                                    class="btn btn-primary"><i class="fas fa-cart-plus me-1"></i> Add to
+                                    Cart</a>
                             </div>
                         </div>
                     </div>

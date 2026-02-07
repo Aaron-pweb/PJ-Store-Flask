@@ -4,6 +4,7 @@ from app.auth import auth_bp
 from app.products import products_bp
 from app.main import main_bp
 from app.payments import payments_bp
+from app.orders import orders_bp
 import os
 from dotenv import load_dotenv
 
@@ -35,6 +36,7 @@ def create_app():
     app.register_blueprint(products_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(payments_bp)
+    app.register_blueprint(orders_bp)
 
     with app.app_context():
         db.create_all()
