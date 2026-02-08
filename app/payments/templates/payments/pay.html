@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Pay for Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Secure Payment</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">You are about to pay for <strong>Order #{{ order.id }}</strong>.</p>
+
+                    <div class="alert alert-info">
+                        <strong>Total Amount:</strong> ${{ order.total_amount }}<br>
+                        <strong>Items:</strong> {{ order.items|length }}
+                    </div>
+
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Pay Now with Chapa</button>
+                            <a href="{{ url_for('products.catalog') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    Secured by Chapa Payment Gateway
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

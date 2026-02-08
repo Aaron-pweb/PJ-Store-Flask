@@ -5,7 +5,7 @@ from app.payments.utils import initiate_chapa_payment, verify_chapa_payment
 import uuid
 
 from app.extensions import db
-from app.orders.models import Order
+from app.orders.models import Order, Cart, CartItem
 from app.products.models import Product
 
 @payments_bp.route("/pay/<int:order_id>", methods=["POST", "GET"])
@@ -46,7 +46,7 @@ def pay(order_id):
             flash("Error initiating payment", "danger")
             return redirect(url_for('orders.checkout'))
             
-    return render_template('pay.html', order=order)
+    return render_template('payments/pay.html', order=order)
 
 @payments_bp.route("/payment-success")
 def payment_success():
@@ -74,6 +74,13 @@ def payment_success():
                     product.stock -= item.quantity
                     db.session.add(product)
             
+            # Clear User's Cart
+            cart = Cart.query.filter_by(user_id=order.user_id).first()
+            if cart:
+                for item in cart.items:
+                    db.session.delete(item)
+                # potentially delete cart too? no, keep it empty.
+
             db.session.commit()
             flash("Payment successful!", "success")
     else:

@@ -58,11 +58,11 @@
           </li>
           {% if current_user.is_authenticated %}
           <li class="nav-item me-2">
-            <a class="nav-link position-relative" href="#">
+            <a class="nav-link position-relative" href="{{ url_for('orders.view_cart') }}">
               <i class="fas fa-shopping-cart fa-lg"></i>
-              <!-- Badge count - Placeholder logic -->
+              <!-- Badge count -->
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                0
+                {{ cart_item_count }}
                 <span class="visually-hidden">items in cart</span>
               </span>
             </a>

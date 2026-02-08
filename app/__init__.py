@@ -34,6 +34,18 @@ def create_app():
     def inject_now():
         return {'now': datetime.utcnow()}
 
+    from app.orders.models import Cart
+    from flask_login import current_user
+    
+    @app.context_processor
+    def inject_cart_count():
+        count = 0
+        if current_user.is_authenticated:
+            cart = Cart.query.filter_by(user_id=current_user.id).first()
+            if cart and cart.items:
+                count = sum(item.quantity for item in cart.items)
+        return {'cart_item_count': count}
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(main_bp)

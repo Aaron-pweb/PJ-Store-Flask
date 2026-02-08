@@ -1,9 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import auth_bp
-from app.auth.forms import UserForm, LoginForm
+from app.auth.forms import UserForm, LoginForm, AddressForm
+from app.auth.models import User, Address
 from app.auth.models import User
-from app.orders.models import Order
+from app.orders.models import Order, OrderItem
+from app.products.models import Product
 from app.support.models import Ticket
 from app.extensions import db
 from app.auth.decorators import role_required, admin_required, seller_required, support_required, super_admin_required, approval_required
@@ -110,7 +112,8 @@ def logout():
 @login_required
 def dashboard():
     """Default dashboard for Customers (and fallback for others)"""
-    return render_template('auth/dashboards/customer_dashboard.html')
+    recent_orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).limit(3).all()
+    return render_template('auth/dashboards/customer_dashboard.html', recent_orders=recent_orders)
 
 @auth_bp.route("/seller/dashboard")
 @login_required
@@ -136,6 +139,29 @@ def admin_dashboard():
                            total_users=total_users,
                            total_orders=total_orders,
                            issues_count=issues_count)
+
+@auth_bp.route("/seller/orders")
+@login_required
+@seller_required
+@approval_required
+def seller_orders():
+    # Find OrderItems for products owned by this seller
+    items = OrderItem.query.join(Product).filter(Product.seller_id == current_user.id).order_by(OrderItem.id.desc()).all()
+    return render_template('auth/dashboards/seller_orders.html', items=items)
+
+@auth_bp.route("/my-orders")
+@login_required
+def my_orders():
+    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template('auth/dashboards/my_orders.html', orders=orders)
+
+@auth_bp.route("/order/<int:order_id>")
+@login_required
+def view_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    if order.user_id != current_user.id:
+        abort(403)
+    return render_template('auth/dashboards/order_detail.html', order=order)
 
 @auth_bp.route("/approve_seller/<int:user_id>", methods=['POST'])
 @login_required
@@ -194,3 +220,83 @@ def super_admin_dashboard():
 @support_required
 def support_dashboard():
     return render_template('auth/dashboards/support_dashboard.html')
+
+# ---------------------------------------------------
+# ADDRESS MANAGEMENT
+# ---------------------------------------------------
+
+@auth_bp.route("/addresses")
+@login_required
+def addresses():
+    user_addresses = Address.query.filter_by(user_id=current_user.id).all()
+    return render_template('auth/addresses.html', addresses=user_addresses)
+
+@auth_bp.route("/addresses/new", methods=["GET", "POST"])
+@login_required
+def add_address():
+    form = AddressForm()
+    if form.validate_on_submit():
+        # If this is the first address, make it default
+        is_first = Address.query.filter_by(user_id=current_user.id).count() == 0
+        
+        address = Address(
+            user_id=current_user.id,
+            full_name=form.full_name.data,
+            phone_number=form.phone_number.data,
+            street_address=form.street_address.data,
+            city=form.city.data,
+            is_default=form.is_default.data or is_first
+        )
+        
+        if address.is_default:
+            # Unset other defaults
+            Address.query.filter_by(user_id=current_user.id, is_default=True).update({'is_default': False})
+            
+        db.session.add(address)
+        db.session.commit()
+        flash('Address added successfully.', 'success')
+        
+        # Check if we were redirected from checkout
+        next_page = request.args.get('next')
+        if next_page:
+            return redirect(next_page)
+            
+        return redirect(url_for('auth.addresses'))
+        
+    return render_template('auth/address_form.html', form=form, title="Add Address")
+
+@auth_bp.route("/addresses/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_address(id):
+    address = Address.query.get_or_404(id)
+    if address.user_id != current_user.id:
+        abort(403)
+        
+    form = AddressForm(obj=address)
+    if form.validate_on_submit():
+        if form.is_default.data:
+             Address.query.filter_by(user_id=current_user.id, is_default=True).update({'is_default': False})
+             
+        address.full_name = form.full_name.data
+        address.phone_number = form.phone_number.data
+        address.street_address = form.street_address.data
+        address.city = form.city.data
+        address.is_default = form.is_default.data
+        
+        db.session.commit()
+        flash('Address updated.', 'success')
+        return redirect(url_for('auth.addresses'))
+        
+    return render_template('auth/address_form.html', form=form, title="Edit Address")
+
+@auth_bp.route("/addresses/delete/<int:id>", methods=["POST"])
+@login_required
+def delete_address(id):
+    address = Address.query.get_or_404(id)
+    if address.user_id != current_user.id:
+        abort(403)
+        
+    db.session.delete(address)
+    db.session.commit()
+    flash('Address deleted.', 'info')
+    return redirect(url_for('auth.addresses'))

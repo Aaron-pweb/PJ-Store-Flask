@@ -13,7 +13,13 @@ class Cart(db.Model):
     items = db.relationship('CartItem', backref='cart', lazy=True, cascade="all, delete-orphan")
 
     def get_total(self):
-        return sum(item.product.price * item.quantity for item in self.items)
+        total = 0
+        for item in self.items:
+            price = item.product.price
+            if item.variant and item.variant.price_override:
+                price = item.variant.price_override
+            total += price * item.quantity
+        return total
 
 class CartItem(db.Model):
     __tablename__ = 'cart_item'
@@ -21,8 +27,10 @@ class CartItem(db.Model):
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, default=1)
+    variant_id = db.Column(db.Integer, db.ForeignKey('product_variant.id'), nullable=True)
 
     product = db.relationship('Product')
+    variant = db.relationship('ProductVariant')
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -32,8 +40,10 @@ class Order(db.Model):
     total_amount = db.Column(db.Float, nullable=False)
     tx_ref = db.Column(db.String(100), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    shipping_address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True) # Check if nullable needed, likely Yes for now or No if strict
     
     user = db.relationship('User', backref='orders')
+    address = db.relationship('Address')
     items = db.relationship('OrderItem', backref='order', lazy=True)
 
 class OrderItem(db.Model):
@@ -43,5 +53,6 @@ class OrderItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price_at_purchase = db.Column(db.Float, nullable=False)
+    variant_name = db.Column(db.String(100), nullable=True) # Snapshot of variant details
 
     product = db.relationship('Product')

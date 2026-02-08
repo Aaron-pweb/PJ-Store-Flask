@@ -15,3 +15,10 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     remember = BooleanField("Remember Me")
+
+class AddressForm(FlaskForm):
+    full_name = StringField("Recipient Name", validators=[DataRequired(), Length(max=100)])
+    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=20)])
+    street_address = StringField("Street Address", validators=[DataRequired(), Length(max=200)])
+    city = StringField("City", validators=[DataRequired(), Length(max=100)])
+    is_default = BooleanField("Set as default address")
