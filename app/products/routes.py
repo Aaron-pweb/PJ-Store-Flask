@@ -1,8 +1,8 @@
 from flask import render_template, redirect, url_for, flash, abort, request
 from app.products import products_bp
 from app.products import products_bp
-from app.products.models import Product, Category
-from app.products.forms import ProductForm
+from app.products.models import Product, Category, ProductVariant
+from app.products.forms import ProductForm, VariantForm
 from flask_login import login_required, current_user
 from app.auth.decorators import seller_required
 from app.extensions import db

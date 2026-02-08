@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.orders.models import Cart, CartItem, Order, OrderItem
-from app.products.models import Product
+from app.products.models import Product, ProductVariant
 from app.orders import orders_bp
 
 @orders_bp.route('/cart')
@@ -16,14 +16,33 @@ def view_cart():
         db.session.commit()
     return render_template('orders/cart.html', cart=cart)
 
-@orders_bp.route('/cart/add/<int:product_id>')
+@orders_bp.route('/cart/add/<int:product_id>', methods=['GET', 'POST'])
 @login_required
 def add_to_cart(product_id):
     product = Product.query.get_or_404(product_id)
+    quantity = 1
+    variant_id = None
+
+    if request.method == 'POST':
+        quantity = int(request.form.get('quantity', 1))
+        variant_id = request.form.get('variant_id')
     
-    if product.stock <= 0:
-        flash('Product is out of stock.', 'danger')
-        return redirect(url_for('products.catalog'))
+    # Check Variant logic
+    if variant_id:
+        variant = ProductVariant.query.get(variant_id)
+        if not variant or variant.product_id != product.id:
+            flash('Invalid product option selected.', 'danger')
+            return redirect(url_for('products.detail', id=product_id))
+        
+        if variant.stock < quantity:
+            flash(f'Sorry, only {variant.stock} left for {variant.variant_name}.', 'warning')
+            return redirect(url_for('products.detail', id=product_id))
+    else:
+        # Check main product stock if no variant logic (or fallback)
+        # Note: If product has variants, we might enforce selection? For now, optional.
+        if product.stock < quantity and not product.variants:
+             flash(f'Sorry, only {product.stock} left.', 'warning')
+             return redirect(url_for('products.detail', id=product_id))
 
     cart = Cart.query.filter_by(user_id=current_user.id).first()
     if not cart:
@@ -31,17 +50,18 @@ def add_to_cart(product_id):
         db.session.add(cart)
         db.session.commit()
     
-    cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product.id).first()
+    # Check if item exists (with same variant)
+    cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product.id, variant_id=variant_id).first()
     if cart_item:
-        cart_item.quantity += 1
-        flash(f'Quantity updated: {product.name} is now {cart_item.quantity}', 'info')
+        cart_item.quantity += quantity
+        flash(f'Quantity updated.', 'info')
     else:
-        cart_item = CartItem(cart_id=cart.id, product_id=product.id, quantity=1)
+        cart_item = CartItem(cart_id=cart.id, product_id=product.id, quantity=quantity, variant_id=variant_id)
         db.session.add(cart_item)
         flash(f'{product.name} added to cart!', 'success')
     
     db.session.commit()
-    return redirect(request.referrer or url_for('products.catalog'))
+    return redirect(url_for('orders.view_cart'))
 
 @orders_bp.route('/cart/remove/<int:item_id>', methods=['POST'])
 @login_required
@@ -90,11 +110,20 @@ def checkout():
         
         # Move items to OrderItem
         for item in cart.items:
+            price = item.product.price
+            variant_name = None
+            
+            if item.variant:
+                if item.variant.price_override:
+                    price = item.variant.price_override
+                variant_name = item.variant.variant_name
+                
             order_item = OrderItem(
                 order_id=order.id, 
                 product_id=item.product.id, 
                 quantity=item.quantity, 
-                price_at_purchase=item.product.price
+                price_at_purchase=price,
+                variant_name=variant_name
             )
             db.session.add(order_item)
         

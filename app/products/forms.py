@@ -11,3 +11,9 @@ class ProductForm(FlaskForm):
     price = FloatField('Price', validators=[DataRequired(), NumberRange(min=0.01)])
     stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField('Save Product')
+
+class VariantForm(FlaskForm):
+    variant_name = StringField('Variant Name (e.g. Size: Large, Red)', validators=[DataRequired(), Length(max=50)])
+    stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=0)])
+    price_override = FloatField('Price Override (Optional)', validators=[NumberRange(min=0.01)], default=None)
+    submit = SubmitField('Add Variant')
