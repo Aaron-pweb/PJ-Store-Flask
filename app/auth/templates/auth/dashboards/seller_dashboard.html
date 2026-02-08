@@ -18,6 +18,37 @@
         </div>
         <div class="col-md-9">
             <h2 class="mb-4">Hello, Seller {{ current_user.full_name }}!</h2>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-white bg-success mb-3 h-100">
+                        <div class="card-header">Total Sales</div>
+                        <div class="card-body">
+                            <h4 class="card-title">${{ "%.2f"|format(total_sales) }}</h4>
+                            <p class="card-text">Lifetime earnings.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-info mb-3 h-100">
+                        <div class="card-header">Pending Orders</div>
+                        <div class="card-body">
+                            <h4 class="card-title">{{ pending_orders_count }}</h4>
+                            <p class="card-text">Orders to ship.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-{{ 'danger' if low_stock_count > 0 else 'secondary' }} mb-3 h-100">
+                        <div class="card-header">Low Stock</div>
+                        <div class="card-body">
+                            <h4 class="card-title">{{ low_stock_count }}</h4>
+                            <p class="card-text">Items < 5 stock.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <p class="card-text">Welcome to your seller dashboard. Here you can manage your products, view

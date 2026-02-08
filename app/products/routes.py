@@ -12,24 +12,28 @@ def catalog():
     query = request.args.get('q')
     category_filter = request.args.get('category')
     
-    products_query = Product.query.filter(Product.stock > 0)
+    products_query = Product.query.filter(Product.stock > 0, Product.is_active == True)
     
     if query:
-        products_query = products_query.filter(
-            (Product.name.ilike(f'%{query}%')) | 
-            (Product.description.ilike(f'%{query}%'))
-        )
+        search_terms = query.split()
+        for term in search_terms:
+            products_query = products_query.filter(
+                (Product.name.ilike(f'%{term}%')) | 
+                (Product.description.ilike(f'%{term}%'))
+            )
     
     if category_filter:
         products_query = products_query.filter(Product.category == category_filter)
         
-    products = products_query.all()
+    page = request.args.get('page', 1, type=int)
+    products_pagination = products_query.paginate(page=page, per_page=12)
+    products = products_pagination.items
     
     # Get categories for sidebar
     # Optimization: Query Category model directly instead of scanning Products table
     categories = [c[0] for c in Category.query.with_entities(Category.name).order_by(Category.name).all()]
 
-    return render_template('products/catalog.html', products=products, categories=categories, active_category=category_filter, search_query=query)
+    return render_template('products/catalog.html', products=products, pagination=products_pagination, categories=categories, active_category=category_filter, search_query=query)
 
 @products_bp.route("/products/<int:id>")
 def detail(id):
@@ -67,8 +71,9 @@ def add_product():
 @login_required
 @seller_required
 def my_products():
-    products = Product.query.filter_by(seller_id=current_user.id).all()
-    return render_template('products/my_products.html', products=products)
+    active_products = Product.query.filter_by(seller_id=current_user.id, is_active=True).all()
+    archived_products = Product.query.filter_by(seller_id=current_user.id, is_active=False).all()
+    return render_template('products/my_products.html', products=active_products, archived_products=archived_products)
 
 @products_bp.route("/products/edit/<int:id>", methods=["GET", "POST"])
 @login_required
@@ -105,7 +110,56 @@ def delete_product(id):
     product = Product.query.get_or_404(id)
     if product.seller_id != current_user.id:
         abort(403)
-    db.session.delete(product)
+    product.is_active = False
     db.session.commit()
-    flash('Product deleted!', 'success')
+    flash('Product archived.', 'success')
     return redirect(url_for('products.my_products'))
+
+@products_bp.route("/products/restore/<int:id>", methods=["POST"])
+@login_required
+@seller_required
+def restore_product(id):
+    product = Product.query.get_or_404(id)
+    if product.seller_id != current_user.id:
+        abort(403)
+    product.is_active = True
+    db.session.commit()
+    flash('Product restored!', 'success')
+    return redirect(url_for('products.my_products'))
+
+@products_bp.route("/products/<int:id>/variants", methods=["GET", "POST"])
+@login_required
+@seller_required
+def manage_variants(id):
+    product = Product.query.get_or_404(id)
+    if product.seller_id != current_user.id:
+        abort(403)
+        
+    form = VariantForm()
+    if form.validate_on_submit():
+        variant = ProductVariant(
+            product_id=product.id,
+            variant_name=form.variant_name.data,
+            stock=form.stock.data,
+            price_override=form.price_override.data
+        )
+        db.session.add(variant)
+        db.session.commit()
+        flash('Variant added!', 'success')
+        return redirect(url_for('products.manage_variants', id=id))
+        
+    return render_template('products/manage_variants.html', product=product, form=form)
+
+@products_bp.route("/products/variants/delete/<int:id>", methods=["POST"])
+@login_required
+@seller_required
+def delete_variant(id):
+    variant = ProductVariant.query.get_or_404(id)
+    product = Product.query.get(variant.product_id)
+    if product.seller_id != current_user.id:
+        abort(403)
+        
+    db.session.delete(variant)
+    db.session.commit()
+    flash('Variant deleted.', 'success')
+    return redirect(url_for('products.manage_variants', id=product.id))

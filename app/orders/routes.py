@@ -123,7 +123,8 @@ def checkout():
                 product_id=item.product.id, 
                 quantity=item.quantity, 
                 price_at_purchase=price,
-                variant_name=variant_name
+                variant_name=variant_name,
+                variant_id=item.variant_id
             )
             db.session.add(order_item)
         

@@ -54,5 +54,6 @@ class OrderItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price_at_purchase = db.Column(db.Float, nullable=False)
     variant_name = db.Column(db.String(100), nullable=True) # Snapshot of variant details
+    variant_id = db.Column(db.Integer, nullable=True) # Link to variant (if it still exists)
 
     product = db.relationship('Product')

@@ -11,48 +11,111 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in products %}
-                    <tr>
-                        <td>{{ product.id }}</td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.category }}</td>
-                        <td>TSH {{ product.price }}</td>
-                        <td>{{ product.stock }}</td>
-                        <td>
-                            <a href="{{ url_for('products.detail', id=product.id) }}" class="btn btn-sm btn-info"
-                                title="View"><i class="fas fa-eye"></i></a>
-                            <a href="{{ url_for('products.edit_product', id=product.id) }}"
-                                class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>
-                            <form action="{{ url_for('products.delete_product', id=product.id) }}" method="POST"
-                                class="d-inline" onsubmit="return confirm('Are you sure?');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i
-                                        class="fas fa-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">You haven't listed any products yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<ul class="nav nav-tabs mb-3" id="productTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button"
+            role="tab">Active Products</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="archived-tab" data-bs-toggle="tab" data-bs-target="#archived" type="button"
+            role="tab">Archived</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="productTabsContent">
+    <!-- Active Tab -->
+    <div class="tab-pane fade show active" id="active" role="tabpanel" aria-labelledby="active-tab">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category }}</td>
+                                <td>TSH {{ product.price }}</td>
+                                <td>{{ product.stock }}</td>
+                                <td>
+                                    <a href="{{ url_for('products.detail', id=product.id) }}"
+                                        class="btn btn-sm btn-info" title="View"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ url_for('products.edit_product', id=product.id) }}"
+                                        class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="{{ url_for('products.manage_variants', id=product.id) }}"
+                                        class="btn btn-sm btn-secondary" title="Manage Variants"><i
+                                            class="fas fa-cogs"></i></a>
+                                    <form action="{{ url_for('products.delete_product', id=product.id) }}" method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to archive this product?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Archive"><i
+                                                class="fas fa-archive"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">No active products.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archived Tab -->
+    <div class="tab-pane fade" id="archived" role="tabpanel" aria-labelledby="archived-tab">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in archived_products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category }}</td>
+                                <td>TSH {{ product.price }}</td>
+                                <td>
+                                    <form action="{{ url_for('products.restore_product', id=product.id) }}"
+                                        method="POST" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-sm btn-success" title="Restore"><i
+                                                class="fas fa-trash-restore"></i> Restore</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No archived products.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -6,7 +6,7 @@ import uuid
 
 from app.extensions import db
 from app.orders.models import Order, Cart, CartItem
-from app.products.models import Product
+from app.products.models import Product, ProductVariant
 
 @payments_bp.route("/pay/<int:order_id>", methods=["POST", "GET"])
 @login_required 
@@ -69,10 +69,16 @@ def payment_success():
             
             # Decrease stock
             for item in order.items:
-                product = Product.query.get(item.product_id)
-                if product:
-                    product.stock -= item.quantity
-                    db.session.add(product)
+                if item.variant_id:
+                    variant = ProductVariant.query.get(item.variant_id)
+                    if variant:
+                        variant.stock -= item.quantity
+                        db.session.add(variant)
+                else:
+                    product = Product.query.get(item.product_id)
+                    if product:
+                        product.stock -= item.quantity
+                        db.session.add(product)
             
             # Clear User's Cart
             cart = Cart.query.filter_by(user_id=order.user_id).first()
@@ -98,5 +104,47 @@ def callback():
 @payments_bp.route("/webhook", methods=["POST"])
 def webhook():
     # Verify signature and update order status
-    # data = request.json
-    return jsonify({"status": "success"}), 200
+    # In production, verify headers['x-chapa-signature']
+    
+    data = request.json or {}
+    tx_ref = data.get('tx_ref')
+    
+    if not tx_ref:
+         # Try to get from GET params just in case
+         tx_ref = request.args.get('tx_ref')
+         
+    if not tx_ref:
+        return jsonify({"status": "failed", "message": "tx_ref missing"}), 400
+
+    # Verify status with Chapa
+    verification = verify_chapa_payment(tx_ref)
+    
+    if verification.get("status") == "success" or verification.get("message") == "Payment details":
+        order = Order.query.filter_by(tx_ref=tx_ref).first()
+        if order:
+            if order.status != 'Paid':
+                order.status = 'Paid'
+                
+                # Decrease stock
+                for item in order.items:
+                    if item.variant_id:
+                        variant = ProductVariant.query.get(item.variant_id)
+                        if variant:
+                            variant.stock -= item.quantity
+                            db.session.add(variant)
+                    else:
+                        product = Product.query.get(item.product_id)
+                        if product:
+                            product.stock -= item.quantity
+                            db.session.add(product)
+                
+                # Clear User's Cart
+                cart = Cart.query.filter_by(user_id=order.user_id).first()
+                if cart:
+                    for item in cart.items:
+                        db.session.delete(item)
+                
+                db.session.commit()
+            return jsonify({"status": "success"}), 200
+            
+    return jsonify({"status": "failed"}), 400

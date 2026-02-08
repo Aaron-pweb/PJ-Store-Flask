@@ -10,6 +10,7 @@ from app.support.models import Ticket
 from app.extensions import db
 from app.auth.decorators import role_required, admin_required, seller_required, support_required, super_admin_required, approval_required
 from app.auth.constants import Roles
+from sqlalchemy import func
 import os
 
 @auth_bp.route("/login", methods=["GET", "POST"])
@@ -120,7 +121,29 @@ def dashboard():
 @seller_required
 @approval_required
 def seller_dashboard():
-    return render_template('auth/dashboards/seller_dashboard.html')
+    # 1. Total Sales
+    total_sales = db.session.query(func.sum(OrderItem.price_at_purchase * OrderItem.quantity)). \
+        join(Product).join(Order). \
+        filter(Product.seller_id == current_user.id). \
+        filter(Order.status == 'Paid').scalar() or 0.0
+
+    # 2. Pending Orders (Paid orders containing my products)
+    pending_orders_count = Order.query.join(OrderItem).join(Product). \
+        filter(Product.seller_id == current_user.id). \
+        filter(Order.status == 'Paid'). \
+        distinct().count()
+
+    # 3. Low Stock
+    low_stock_count = Product.query.filter(
+        Product.seller_id == current_user.id, 
+        Product.stock < 5,
+        Product.is_active == True
+    ).count()
+
+    return render_template('auth/dashboards/seller_dashboard.html', 
+                           total_sales=total_sales, 
+                           pending_orders_count=pending_orders_count, 
+                           low_stock_count=low_stock_count)
 
 @auth_bp.route("/admin/dashboard")
 @login_required

@@ -15,6 +15,7 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, default=0)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     seller = db.relationship('User', backref='products')
