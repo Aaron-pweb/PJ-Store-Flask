@@ -1,0 +1,94 @@
+PJ-Store-Flask Project Structure
+Generated on: Sunday, February 8, 2026
+
+.
+├── app
+│   ├── auth
+│   │   ├── constants.py
+│   │   ├── decorators.py
+│   │   ├── forms.py
+│   │   ├── __init__.py
+│   │   ├── models.py
+│   │   ├── routes.py
+│   │   └── templates
+│   │       └── auth
+│   │           ├── addresses.html
+│   │           ├── address_form.html
+│   │           ├── dashboards
+│   │           │   ├── admin_dashboard.html
+│   │           │   ├── customer_dashboard.html
+│   │           │   ├── my_orders.html
+│   │           │   ├── order_detail.html
+│   │           │   ├── seller_dashboard.html
+│   │           │   ├── seller_orders.html
+│   │           │   ├── super_admin_dashboard.html
+│   │           │   └── support_dashboard.html
+│   │           ├── login.html
+│   │           ├── logs.html
+│   │           ├── manage_users.html
+│   │           └── signup.html
+│   ├── extensions.py
+│   ├── __init__.py
+│   ├── main
+│   │   ├── __init__.py
+│   │   ├── routes.py
+│   │   └── templates
+│   │       └── main
+│   │           └── index.html
+│   ├── orders
+│   │   ├── __init__.py
+│   │   ├── models.py
+│   │   ├── routes.py
+│   │   └── templates
+│   │       └── orders
+│   │           └── checkout_address.html
+│   ├── payments
+│   │   ├── __init__.py
+│   │   ├── routes.py
+│   │   ├── templates
+│   │       └── payments
+│   │           └── pay.html
+│   │   └── utils.py
+│   ├── products
+│   │   ├── forms.py
+│   │   ├── __init__.py
+│   │   ├── models.py
+│   │   ├── routes.py
+│   │   ├── templates
+│   │       └── products
+│   │           ├── catalog.html
+│   │           ├── detail.html
+│   │           ├── manage_variants.html
+│   │           ├── my_products.html
+│   │           └── product_form.html
+│   │   └── utils.py
+│   ├── static
+│   │   ├── css
+│   │   ├── img
+│   │   ├── js
+│   │   │   └── theme.js
+│   │   └── product_pics
+│   │       └── default.jpg
+│   ├── support
+│   │   ├── __init__.py
+│   │   ├── models.py
+│   │   ├── routes.py
+│   │   └── templates
+│   │       └── support
+│   │           └── ticket_list.html
+│   └── templates
+│       ├── base.html
+│       ├── index.html
+│       ├── login.html
+│       ├── orders
+│       │   └── cart.html
+│       ├── payments
+│       │   └── success.html
+│       └── register.html
+├── create_super_admin.py
+├── instructions.txt
+├── requirements.txt
+├── run.py
+└── sales
+    └── templates
+        └── support

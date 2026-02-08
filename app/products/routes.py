@@ -25,6 +25,16 @@ def catalog():
     if category_filter:
         products_query = products_query.filter(Product.category == category_filter)
         
+    sort = request.args.get('sort')
+    if sort == 'price_asc':
+        products_query = products_query.order_by(Product.price.asc())
+    elif sort == 'price_desc':
+        products_query = products_query.order_by(Product.price.desc())
+    elif sort == 'newest':
+        products_query = products_query.order_by(Product.id.desc())
+    else:
+        products_query = products_query.order_by(Product.id.desc()) # Default newest
+
     page = request.args.get('page', 1, type=int)
     products_pagination = products_query.paginate(page=page, per_page=12)
     products = products_pagination.items
@@ -33,7 +43,7 @@ def catalog():
     # Optimization: Query Category model directly instead of scanning Products table
     categories = [c[0] for c in Category.query.with_entities(Category.name).order_by(Category.name).all()]
 
-    return render_template('products/catalog.html', products=products, pagination=products_pagination, categories=categories, active_category=category_filter, search_query=query)
+    return render_template('products/catalog.html', products=products, pagination=products_pagination, categories=categories, active_category=category_filter, search_query=query, current_sort=sort)
 
 @products_bp.route("/products/<int:id>")
 def detail(id):
@@ -47,6 +57,9 @@ from app.products.utils import save_picture
 @seller_required
 def add_product():
     form = ProductForm()
+    # Populate category choices dynamically
+    form.category.choices = [(c.name, c.name) for c in Category.query.all()]
+    
     if form.validate_on_submit():
         image_file = 'default.jpg'
         if form.image.data:
@@ -83,6 +96,9 @@ def edit_product(id):
     if product.seller_id != current_user.id:
         abort(403)
     form = ProductForm()
+    # Populate category choices dynamically
+    form.category.choices = [(c.name, c.name) for c in Category.query.all()]
+    
     if form.validate_on_submit():
         if form.image.data:
             product.image_file = save_picture(form.image.data)

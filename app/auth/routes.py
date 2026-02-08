@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import auth_bp
-from app.auth.forms import UserForm, LoginForm, AddressForm
+from app.auth.forms import UserForm, LoginForm, AddressForm, ProfileForm
 from app.auth.models import User, Address
 from app.auth.models import User
 from app.orders.models import Order, OrderItem
@@ -104,6 +104,21 @@ def logout():
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for('main.index'))
+
+@auth_bp.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    form = ProfileForm()
+    if form.validate_on_submit():
+        current_user.full_name = form.full_name.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('auth.profile'))
+    elif request.method == 'GET':
+        form.full_name.data = current_user.full_name
+        form.email.data = current_user.email
+    return render_template('auth/profile.html', form=form)
 
 # ---------------------------------------------------
 # DASHBOARDS

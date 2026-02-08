@@ -13,7 +13,7 @@ load_dotenv()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    app.secret_key = os.getenv("APP_SECRE_KEY", "dev_key")
+    app.secret_key = os.getenv("APP_SECRET_KEY", "dev_key")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 

@@ -73,7 +73,7 @@
               <i class="fas fa-user-circle fa-lg"></i> {{ current_user.username }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">Profile</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>

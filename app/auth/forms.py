@@ -22,3 +22,9 @@ class AddressForm(FlaskForm):
     street_address = StringField("Street Address", validators=[DataRequired(), Length(max=200)])
     city = StringField("City", validators=[DataRequired(), Length(max=100)])
     is_default = BooleanField("Set as default address")
+
+class ProfileForm(FlaskForm):
+    full_name = StringField("Full Name", validators=[DataRequired(), Length(max=100)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    # In a real app, you might want to handle password changes separately
+    # or add current_password verification for email changes.
