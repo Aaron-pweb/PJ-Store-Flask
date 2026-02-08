@@ -1,97 +1,125 @@
 {% extends "base.html" %}
 
-{% block title %}Sign Up - PJ-STORE-FLASK{% endblock %}
+{% block title %}Sign Up - PJ-STORE{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Create Account</h3>
-                <form action="" method="post">
-                    {{ form.hidden_tag() }}
-
-                    <!-- Full Name -->
-                    <div class="mb-3">
-                        {{ form.full_name.label(class="form-label") }}
-                        {{ form.full_name(class="form-control", placeholder="John Doe") }}
-                        {% for error in form.full_name.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-xl-10">
+            <div class="card rounded-3 text-black shadow-lg overflow-hidden">
+                <div class="row g-0">
+                    <!-- Left Side: Branding -->
+                    <div class="col-lg-5 d-none d-lg-block bg-primary text-white p-5 d-flex align-items-center justify-content-center"
+                         style="background: linear-gradient(135deg, #6610f2 0%, #0d6efd 100%);">
+                        <div class="text-center">
+                            <i class="fas fa-rocket fa-5x mb-4"></i>
+                            <h2 class="fw-bold mb-3">Join Us Today</h2>
+                            <p class="lead">Create an account to start shopping, track orders, and get personalized recommendations.</p>
+                        </div>
                     </div>
+                    
+                    <!-- Right Side: Form -->
+                    <div class="col-lg-7">
+                        <div class="card-body p-md-5 mx-md-4">
 
-                    <!-- Account Type -->
-                    <div class="mb-3">
-                        {{ form.account_type.label(class="form-label") }}
-                        {{ form.account_type(class="form-select") }}
-                        {% for error in form.account_type.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                            <div class="text-center mb-4 d-lg-none">
+                                <h4 class="mt-1 mb-3 pb-1">PJ-STORE</h4>
+                            </div>
 
-                    <!-- Username -->
-                    <div class="mb-3">
-                        {{ form.user_name.label(class="form-label") }}
-                        {{ form.user_name(class="form-control", placeholder="johndoe") }}
-                        {% for error in form.user_name.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                            <form action="" method="post">
+                                {{ form.hidden_tag() }}
+                                
+                                <h4 class="mb-4">Create Account</h4>
 
-                    <!-- Email -->
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control", placeholder="name@example.com") }}
-                        {% for error in form.email.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {{ form.full_name(class="form-control", id="floatingName", placeholder="Full Name") }}
+                                            {{ form.full_name.label(for="floatingName") }}
+                                            {% for error in form.full_name.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {{ form.user_name(class="form-control", id="floatingUser", placeholder="Username") }}
+                                            {{ form.user_name.label(for="floatingUser") }}
+                                            {% for error in form.user_name.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <!-- Age -->
-                    <div class="mb-3">
-                        {{ form.user_age.label(class="form-label") }}
-                        {{ form.user_age(class="form-control", placeholder="25") }}
-                        {% for error in form.user_age.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                                <div class="form-floating mb-3">
+                                    {{ form.email(class="form-control", id="floatingEmail", placeholder="name@example.com") }}
+                                    {{ form.email.label(for="floatingEmail") }}
+                                    {% for error in form.email.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
 
-                    <!-- Password -->
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
-                        <div id="passwordHelp" class="form-text">Must be at least 6 characters long.</div>
-                        {% for error in form.password.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {{ form.account_type(class="form-select", id="floatingType") }}
+                                            {{ form.account_type.label(for="floatingType") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {{ form.user_age(class="form-control", id="floatingAge", placeholder="Age") }}
+                                            {{ form.user_age.label(for="floatingAge") }}
+                                            {% for error in form.user_age.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <!-- Confirm Password -->
-                    <div class="mb-3">
-                        {{ form.confirm_password.label(class="form-label") }}
-                        {{ form.confirm_password(class="form-control") }}
-                        {% for error in form.confirm_password.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {{ form.password(class="form-control", id="floatingPass", placeholder="Password") }}
+                                            {{ form.password.label(for="floatingPass") }}
+                                            {% for error in form.password.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {{ form.confirm_password(class="form-control", id="floatingConfirm", placeholder="Confirm") }}
+                                            {{ form.confirm_password.label(for="floatingConfirm") }}
+                                            {% for error in form.confirm_password.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" value="" id="terms" required>
-                        <label class="form-check-label small" for="terms">
-                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#"
-                                class="text-decoration-none">Privacy Policy</a>
-                        </label>
-                    </div>
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" value="" id="terms" required>
+                                    <label class="form-check-label small" for="terms">
+                                        I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#"
+                                            class="text-decoration-none">Privacy Policy</a>
+                                    </label>
+                                </div>
 
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary">Sign Up</button>
-                    </div>
+                                <div class="d-grid mb-4">
+                                    <button class="btn btn-primary btn-lg" type="submit">Sign Up</button>
+                                </div>
 
-                    <div class="text-center">
-                        <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}"
-                                class="text-decoration-none">Login</a></p>
+                                <div class="text-center">
+                                    <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}"
+                                            class="text-decoration-none fw-bold">Login here</a></p>
+                                </div>
+                            </form>
+
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
