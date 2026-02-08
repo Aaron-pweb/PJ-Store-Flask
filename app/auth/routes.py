@@ -4,6 +4,7 @@ from app.auth import auth_bp
 from app.auth.forms import UserForm, LoginForm
 from app.auth.models import User
 from app.orders.models import Order
+from app.support.models import Ticket
 from app.extensions import db
 from app.auth.decorators import role_required, admin_required, seller_required, support_required, super_admin_required, approval_required
 from app.auth.constants import Roles
@@ -128,7 +129,7 @@ def admin_dashboard():
     # Stats
     total_users = User.query.count()
     total_orders = Order.query.count()
-    issues_count = 0 # Placeholder for Ticket model
+    issues_count = Ticket.query.filter_by(status='Open').count()
     
     return render_template('auth/dashboards/admin_dashboard.html', 
                            pending_sellers=pending_sellers,

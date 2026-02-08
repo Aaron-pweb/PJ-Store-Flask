@@ -5,6 +5,7 @@ from app.products import products_bp
 from app.main import main_bp
 from app.payments import payments_bp
 from app.orders import orders_bp
+from app.support import support_bp
 import os
 from dotenv import load_dotenv
 
@@ -18,8 +19,9 @@ def create_app():
 
     db.init_app(app)
     
-    from app.extensions import login_manager
+    from app.extensions import login_manager, csrf
     login_manager.init_app(app)
+    csrf.init_app(app)
     login_manager.login_view = 'auth.login'
 
     from app.auth.models import User
@@ -37,6 +39,7 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(payments_bp)
     app.register_blueprint(orders_bp)
+    app.register_blueprint(support_bp)
 
     with app.app_context():
         db.create_all()
