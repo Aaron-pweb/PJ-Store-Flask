@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Support Dashboard - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1>Support Dashboard</h1>
+    <p class="lead">Help Desk & Order Resolution Center</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Recent Tickets / Orders
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center">No active tickets.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Tools</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Lookup Order</a></li>
+                        <li><a href="#">Lookup User</a></li>
+                        <li><a href="#">View Knowledge Base</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

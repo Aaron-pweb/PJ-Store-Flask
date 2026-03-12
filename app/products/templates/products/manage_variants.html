@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Variants - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h2>Variants for: {{ product.name }}</h2>
+            <a href="{{ url_for('products.my_products') }}" class="btn btn-outline-secondary">Back to Products</a>
+        </div>
+
+        <!-- Existing Variants List -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Existing Variants</h5>
+                </div>
+                <div class="card-body">
+                    {% if product.variants %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Stock</th>
+                                    <th>Price Override</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for variant in product.variants %}
+                                <tr>
+                                    <td>{{ variant.variant_name }}</td>
+                                    <td>{{ variant.stock }}</td>
+                                    <td>
+                                        {% if variant.price_override %}
+                                        ${{ variant.price_override }}
+                                        {% else %}
+                                        <span class="text-muted">Default (${{ product.price }})</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('products.delete_variant', id=variant.id) }}"
+                                            method="POST" onsubmit="return confirm('Delete this variant?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">No variants defined. This product is sold as a single item with stock:
+                        {{ product.stock }}.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Variant Form -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Add Variant</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.variant_name.label(class="form-label") }}
+                            {{ form.variant_name(class="form-control", placeholder="e.g. Size: Large") }}
+                            {% for error in form.variant_name.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.stock.label(class="form-label") }}
+                            {{ form.stock(class="form-control") }}
+                            {% for error in form.stock.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.price_override.label(class="form-label") }}
+                            {{ form.price_override(class="form-control", placeholder="Optional") }}
+                            <small class="text-muted d-block">Leave empty to use base price.</small>
+                            {% for error in form.price_override.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

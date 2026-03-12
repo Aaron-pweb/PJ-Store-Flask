@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <div class="display-1 text-danger">500</div>
+    <h1 class="mb-3">Internal Server Error</h1>
+    <p class="lead mb-4">Something went wrong on our end. We are working to fix it. Please try again later.</p>
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary rounded-pill">Go to Homepage</a>
+</div>
+{% endblock %}

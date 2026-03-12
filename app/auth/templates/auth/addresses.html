@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}My Addresses - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Addresses</h2>
+        <a href="{{ url_for('auth.add_address') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add New
+            Address</a>
+    </div>
+
+    {% if addresses %}
+    <div class="row">
+        {% for address in addresses %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm {{ 'border-primary' if address.is_default else '' }}">
+                <div class="card-body">
+                    {% if address.is_default %}
+                    <span class="badge bg-primary mb-2">Default</span>
+                    {% endif %}
+                    <h5 class="card-title">{{ address.full_name }}</h5>
+                    <p class="card-text">
+                        {{ address.street_address }}<br>
+                        {{ address.city }}, {{ address.state or '' }} {{ address.zip_code or '' }}<br>
+                        {{ address.country }}<br>
+                        <i class="fas fa-phone-alt text-muted"></i> {{ address.phone_number }}
+                    </p>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-between">
+                    <a href="{{ url_for('auth.edit_address', id=address.id) }}"
+                        class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <form action="{{ url_for('auth.delete_address', id=address.id) }}" method="POST"
+                        onsubmit="return confirm('Are you sure?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        You have no saved addresses. <a href="{{ url_for('auth.add_address') }}">Add one now</a>.
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('auth.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Seller Orders - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Seller Orders</h1>
+        <a href="{{ url_for('auth.seller_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>#{{ item.order.id }}</td>
+                            <td>{{ item.order.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>TSH {{ item.quantity * item.price_at_purchase }}</td>
+                            <td>{{ item.order.user.full_name }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if item.order.status == 'Paid' else 'warning' }}">
+                                    {{ item.order.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">No orders found for your products.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Orders</h2>
+        <a href="{{ url_for('auth.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    {% if orders %}
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>${{ order.total_amount }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if order.status == 'Paid' else 'warning' }}">
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('auth.view_order', order_id=order.id) }}"
+                                    class="btn btn-sm btn-info me-1">View</a>
+                                {% if order.status == 'Pending' %}
+                                <a href="{{ url_for('payments.pay', order_id=order.id) }}"
+                                    class="btn btn-sm btn-primary">Pay Now</a>
+                                {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled>Paid</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        You haven't placed any orders yet. <a href="{{ url_for('products.catalog') }}">Start Shopping!</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

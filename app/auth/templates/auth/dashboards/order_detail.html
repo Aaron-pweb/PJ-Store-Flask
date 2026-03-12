@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Order Used #{{ order.id }}</h2>
+        <div>
+            <span class="badge bg-{{ 'success' if order.status == 'Paid' else 'warning' }} fs-5">{{ order.status
+                }}</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Order Items -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>${{ item.price_at_purchase }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.price_at_purchase * item.quantity }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td><strong>${{ order.total_amount }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ url_for('auth.my_orders') }}" class="btn btn-secondary">Back to My Orders</a>
+        </div>
+
+        <!-- Order Info Sidebar -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Shipping Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if order.address %}
+                    <p>
+                        <strong>{{ order.address.full_name }}</strong><br>
+                        {{ order.address.street_address }}<br>
+                        {{ order.address.city }}, {{ order.address.state or ''}} {{ order.address.zip_code or ''}}<br>
+                        {{ order.address.country }}<br>
+                        <br>
+                        <i class="fas fa-phone"></i> {{ order.address.phone_number }}
+                    </p>
+                    {% else %}
+                    <p class="text-muted">No shipping address recorded for this order.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Payment Info</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}<br>
+                        <strong>Transaction Ref:</strong> {{ order.tx_ref or 'Pending' }}
+                    </p>
+                    {% if order.status == 'Pending' %}
+                    <div class="d-grid">
+                        <a href="{{ url_for('payments.pay', order_id=order.id) }}" class="btn btn-primary">Pay Now</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
