@@ -2,9 +2,9 @@ from flask import render_template, redirect, url_for, flash, abort, request
 from app.products import products_bp
 from app.products import products_bp
 from app.products.models import Product, Category, ProductVariant
-from app.products.forms import ProductForm, VariantForm
+from app.products.forms import ProductForm, VariantForm, CategoryForm
 from flask_login import login_required, current_user
-from app.auth.decorators import seller_required
+from app.auth.decorators import seller_required, admin_required
 from app.extensions import db
 
 @products_bp.route("/products")
@@ -52,13 +52,30 @@ def detail(id):
 
 from app.products.utils import save_picture
 
+@products_bp.route("/category/add", methods=["GET", "POST"])
+@login_required
+@admin_required
+def add_category():
+    form = CategoryForm()
+    if form.validate_on_submit():
+        category = Category(name=form.name.data, slug=form.slug.data)
+        db.session.add(category)
+        db.session.commit()
+        flash('Category added!', 'success')
+        return redirect(url_for('products.add_product'))
+    return render_template('products/category_form.html', form=form, title="Add Category")
+
 @products_bp.route("/products/add", methods=["GET", "POST"])
 @login_required
 @seller_required
 def add_product():
+    categories = Category.query.all()
+    if not categories:
+        flash("No categories found. Please ask an administrator to add categories first.", "warning")
+
     form = ProductForm()
     # Populate category choices dynamically
-    form.category.choices = [(c.name, c.name) for c in Category.query.all()]
+    form.category.choices = [(c.name, c.name) for c in categories]
     
     if form.validate_on_submit():
         image_file = 'default.jpg'
@@ -95,9 +112,11 @@ def edit_product(id):
     product = Product.query.get_or_404(id)
     if product.seller_id != current_user.id:
         abort(403)
+    
+    categories = Category.query.all()
     form = ProductForm()
     # Populate category choices dynamically
-    form.category.choices = [(c.name, c.name) for c in Category.query.all()]
+    form.category.choices = [(c.name, c.name) for c in categories]
     
     if form.validate_on_submit():
         if form.image.data:

@@ -17,3 +17,8 @@ class VariantForm(FlaskForm):
     stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=0)])
     price_override = FloatField('Price Override (Optional)', validators=[NumberRange(min=0.01)], default=None)
     submit = SubmitField('Add Variant')
+
+class CategoryForm(FlaskForm):
+    name = StringField('Category Name', validators=[DataRequired(), Length(min=2, max=50)])
+    slug = StringField('Slug (URL friendly name)', validators=[DataRequired(), Length(min=2, max=50)])
+    submit = SubmitField('Add Category')
