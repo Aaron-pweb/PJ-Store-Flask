@@ -3,4 +3,4 @@ instance/
 /.env
 __pycache__/
 venv/
-imgs/
+# imgs/

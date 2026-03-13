@@ -6,9 +6,11 @@
 
 PJ Store is a comprehensive, full-stack e-commerce platform built with Python and Flask. It provides a robust, multi-role ecosystem for customers, sellers, and administrators, featuring product management, secure payments with Stripe, and an integrated support system.
 ![Alt text](imgs/img1.png)
+
 ## 🌟 Features
 
 ### 👥 User Roles & Management
+
 - **Super Admin:** Full platform control, including managing admins and global settings.
 - **Admin:** Manage users, approve sellers, and oversee product listings.
 - **Seller:** Dedicated dashboard for managing products, variants, inventory, and orders.
@@ -16,12 +18,14 @@ PJ Store is a comprehensive, full-stack e-commerce platform built with Python an
 - **Customer:** Browsing products, managing a shopping cart, and tracking orders.
 
 ### 🛍️ E-commerce Core
+
 - **Product Management:** Dynamic catalog with support for product variants (e.g., size, color, material) and price overrides.
 - **Shopping Cart:** Real-time cart management for authenticated users.
 - **Secure Checkout:** Full integration with **Stripe API** for processing payments safely.
 - **Address Book:** Users can save and manage multiple shipping addresses with a default selection.
 
 ### 🛠️ Technical Highlights
+
 - **Responsive Design:** Built with **Bootstrap 5** for a seamless experience across desktop and mobile.
 - **Security:** Implements CSRF protection, secure password hashing, and role-based access control (RBAC).
 - **Database:** Powered by **SQLAlchemy** with support for SQLite (development) and PostgreSQL (production).
@@ -44,24 +48,29 @@ PJ Store is a comprehensive, full-stack e-commerce platform built with Python an
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/yourusername/PJ-Store-Flask.git
 cd PJ-Store-Flask
 ```
 
 ### 2. Create a Virtual Environment
+
 ```bash
 python3 -m venv venv
 source venv/bin/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Environment Configuration
+
 Create a `.env` file in the root directory and add the following:
+
 ```env
 APP_SECRET_KEY=your_secret_key_here
 STRIPE_PUBLIC_KEY=your_stripe_public_key
@@ -70,15 +79,19 @@ DATABASE_URL=sqlite:///site.db  # Or your PostgreSQL URL
 ```
 
 ### 5. Initialize the Database & Super Admin
+
 Run the following command to create your first administrative account:
+
 ```bash
 python create_super_admin.py
 ```
 
 ### 6. Run the Application
+
 ```bash
 python run.py
 ```
+
 The application will be available at `http://127.0.0.1:5000`.
 
 ---
