@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 PJ Store is a comprehensive, full-stack e-commerce platform built with Python and Flask. It provides a robust, multi-role ecosystem for customers, sellers, and administrators, featuring product management, secure payments with Stripe, and an integrated support system.
-![Alt text](imgs/img1.png?raw=true "Title")
+![Alt text](imgs/img1.png)
 ## 🌟 Features
 
 ### 👥 User Roles & Management
