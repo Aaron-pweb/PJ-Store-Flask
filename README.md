@@ -101,18 +101,18 @@ The application will be available at `http://127.0.0.1:5000`.
 ```text
 PJ-Store-Flask/
 ├── app/
-│   ├── auth/           # Authentication, User Models, & Dashboards
-│   ├── main/           # Core landing pages and routes
-│   ├── products/       # Product catalog, variants, and seller management
-│   ├── orders/         # Shopping cart and order processing
-│   ├── payments/       # Stripe integration and payment logic
-│   ├── support/        # Ticket-based support system
-│   ├── static/         # CSS, JS, and product images
-│   └── templates/      # Jinja2 HTML templates
-├── instance/           # Local database (SQLite)
-├── create_super_admin.py # CLI for admin setup
-├── run.py              # Application entry point
-└── requirements.txt    # Project dependencies
+│   ├── auth/            
+│   ├── main/            
+│   ├── products/       
+│   ├── orders/          
+│   ├── payments/       
+│   ├── support/         
+│   ├── static/          
+│   └── templates/       
+├── instance/            
+├── create_super_admin.py  
+├── run.py               
+└── requirements.txt    
 ```
 
 ---
