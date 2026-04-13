@@ -13,3 +13,4 @@ stripe==14.3.0
 python-dotenv==1.2.1
 requests
 email_validator
+authlib

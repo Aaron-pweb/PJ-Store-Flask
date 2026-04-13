@@ -13,7 +13,8 @@ class User(db.Model, UserMixin):
     user_name = db.Column(db.String(150), nullable=False, unique=True)
     age = db.Column(db.Integer, nullable=True)
     email = db.Column(db.String, nullable=False, unique=True)
-    password = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=True)
+    google_id = db.Column(db.String(100), nullable=True, unique=True)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

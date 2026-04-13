@@ -111,6 +111,10 @@
                                     <button class="btn btn-primary btn-lg" type="submit">Sign Up</button>
                                 </div>
 
+                                <div class="d-grid gap-2 mb-4">
+                                    <a href="{{ url_for('auth.google_login') }}" class="btn btn-outline-danger"><i class="fab fa-google me-2"></i> Sign up with Google</a>
+                                </div>
+
                                 <div class="text-center">
                                     <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}"
                                             class="text-decoration-none fw-bold">Login here</a></p>

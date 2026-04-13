@@ -19,9 +19,21 @@ def create_app():
 
     db.init_app(app)
     
-    from app.extensions import login_manager, csrf
+    from app.extensions import login_manager, csrf, oauth
     login_manager.init_app(app)
     csrf.init_app(app)
+    oauth.init_app(app)
+    
+    oauth.register(
+        name='google',
+        client_id=os.getenv("GOOGLE_CLIENT_ID"),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={
+            'scope': 'openid email profile'
+        }
+    )
+
     login_manager.login_view = 'auth.login'
 
     from app.auth.models import User

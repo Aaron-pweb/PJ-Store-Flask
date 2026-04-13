@@ -7,7 +7,7 @@ from app.auth.models import User
 from app.orders.models import Order, OrderItem
 from app.products.models import Product
 from app.support.models import Ticket
-from app.extensions import db
+from app.extensions import db, oauth
 from app.auth.decorators import role_required, admin_required, seller_required, support_required, super_admin_required, approval_required
 from app.auth.constants import Roles
 from sqlalchemy import func
@@ -338,3 +338,71 @@ def delete_address(id):
     db.session.commit()
     flash('Address deleted.', 'info')
     return redirect(url_for('auth.addresses'))
+
+# ---------------------------------------------------
+# GOOGLE AUTH
+# ---------------------------------------------------
+
+@auth_bp.route("/google/login")
+def google_login():
+    redirect_uri = url_for('auth.google_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@auth_bp.route("/google/callback")
+def google_callback():
+    token = oauth.google.authorize_access_token()
+    user_info = token.get('userinfo')
+    
+    if not user_info:
+        flash("Google login failed.", "danger")
+        return redirect(url_for('auth.login'))
+        
+    google_id = user_info['sub']
+    email = user_info['email']
+    name = user_info.get('name', email.split('@')[0])
+    
+    user = User.query.filter((User.google_id == google_id) | (User.email == email)).first()
+    
+    if not user:
+        # Check if username is taken
+        base_username = email.split('@')[0]
+        user_name = base_username
+        counter = 1
+        while User.query.filter_by(user_name=user_name).first():
+            user_name = f"{base_username}{counter}"
+            counter += 1
+
+        # Create a new user if they don't exist
+        user = User(
+            full_name=name,
+            user_name=user_name,
+            email=email,
+            google_id=google_id,
+            role=Roles.CUSTOMER,
+            is_approved=True
+        )
+        db.session.add(user)
+        db.session.commit()
+    elif not user.google_id:
+        # Link Google ID if it was a local account with the same email
+        user.google_id = google_id
+        db.session.commit()
+        
+    if not user.is_approved:
+        flash("Your account is pending admin approval.", "warning")
+        return redirect(url_for('auth.login'))
+        
+    login_user(user)
+    flash("Successfully logged in with Google!", "success")
+    
+    # Redirect based on role (standard logic)
+    if user.role == Roles.ADMIN:
+        return redirect(url_for('auth.admin_dashboard'))
+    elif user.role == Roles.SELLER:
+        return redirect(url_for('auth.seller_dashboard'))
+    elif user.role == Roles.SUPER_ADMIN:
+         return redirect(url_for('auth.super_admin_dashboard'))
+    elif user.role == Roles.SUPPORT:
+         return redirect(url_for('auth.support_dashboard'))
+    else:
+         return redirect(url_for('main.index'))
