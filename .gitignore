@@ -2,4 +2,6 @@
 instance/
 /.env
 __pycache__/
-venv/
+venv/  
+client_secret_550587390107-f0pccn5iodp43b5h27n6m6g0n2ljkehp.apps.googleusercontent.com.json
+google-O-auth.json
