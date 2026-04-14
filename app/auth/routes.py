@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, abort
+from flask import render_template, request, redirect, url_for, flash, abort, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import auth_bp
 from app.auth.forms import UserForm, LoginForm, AddressForm, ProfileForm
@@ -345,6 +345,8 @@ def delete_address(id):
 
 @auth_bp.route("/google/login")
 def google_login():
+    role = request.args.get('role', Roles.CUSTOMER)
+    session['google_signup_role'] = role
     redirect_uri = url_for('auth.google_callback', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -364,6 +366,9 @@ def google_callback():
     user = User.query.filter((User.google_id == google_id) | (User.email == email)).first()
     
     if not user:
+        # Get requested role from session
+        role = session.pop('google_signup_role', Roles.CUSTOMER)
+        
         # Check if username is taken
         base_username = email.split('@')[0]
         user_name = base_username
@@ -373,13 +378,17 @@ def google_callback():
             counter += 1
 
         # Create a new user if they don't exist
+        is_approved = True
+        if role == Roles.SELLER:
+            is_approved = False
+
         user = User(
             full_name=name,
             user_name=user_name,
             email=email,
             google_id=google_id,
-            role=Roles.CUSTOMER,
-            is_approved=True
+            role=role,
+            is_approved=is_approved
         )
         db.session.add(user)
         db.session.commit()

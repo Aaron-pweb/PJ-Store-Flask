@@ -112,8 +112,17 @@
                                 </div>
 
                                 <div class="d-grid gap-2 mb-4">
-                                    <a href="{{ url_for('auth.google_login') }}" class="btn btn-outline-danger"><i class="fab fa-google me-2"></i> Sign up with Google</a>
+                                    <a href="{{ url_for('auth.google_login', role='customer') }}" id="google-signup-btn" class="btn btn-outline-danger"><i class="fab fa-google me-2"></i> Sign up with Google</a>
                                 </div>
+
+                                <script>
+                                    document.getElementById('floatingType').addEventListener('change', function() {
+                                        const role = this.value;
+                                        const googleBtn = document.getElementById('google-signup-btn');
+                                        const baseUrl = "{{ url_for('auth.google_login') }}";
+                                        googleBtn.href = baseUrl + "?role=" + role;
+                                    });
+                                </script>
 
                                 <div class="text-center">
                                     <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}"
