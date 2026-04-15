@@ -4,3 +4,4 @@ instance/
 __pycache__/
 venv/
 google-O-auth.json
+db-analysis.txt

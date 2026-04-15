@@ -14,3 +14,4 @@ python-dotenv==1.2.1
 requests
 email_validator
 authlib
+psycopg2-binary
