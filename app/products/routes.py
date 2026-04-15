@@ -1,8 +1,9 @@
 from flask import render_template, redirect, url_for, flash, abort, request
 from app.products import products_bp
 from app.products import products_bp
-from app.products.models import Product, Category, ProductVariant
-from app.products.forms import ProductForm, VariantForm, CategoryForm
+from app.products.models import Product, Category, ProductVariant, Review, Wishlist
+from app.products.forms import ProductForm, VariantForm, CategoryForm, ReviewForm
+from app.orders.models import OrderItem, Order
 from flask_login import login_required, current_user
 from app.auth.decorators import seller_required, admin_required
 from app.extensions import db
@@ -48,7 +49,89 @@ def catalog():
 @products_bp.route("/products/<int:id>")
 def detail(id):
     product = Product.query.get_or_404(id)
-    return render_template('products/detail.html', product=product)
+    reviews = Review.query.filter_by(product_id=id).order_by(Review.created_at.desc()).all()
+    avg_rating = sum(r.rating for r in reviews) / len(reviews) if reviews else 0
+
+    in_wishlist = False
+    can_review = False
+
+    if current_user.is_authenticated:
+        in_wishlist = Wishlist.query.filter_by(user_id=current_user.id, product_id=id).first() is not None
+
+        # Check if user has a delivered order for this product and hasn't reviewed it yet
+        purchased_item = OrderItem.query.join(Order).filter(
+            Order.user_id == current_user.id,
+            Order.status == 'Delivered',
+            OrderItem.product_id == id
+        ).first()
+
+        if purchased_item:
+            existing_review = Review.query.filter_by(user_id=current_user.id, order_item_id=purchased_item.id).first()
+            if not existing_review:
+                can_review = True
+
+    return render_template('products/detail.html', product=product, reviews=reviews, avg_rating=avg_rating, in_wishlist=in_wishlist, can_review=can_review)
+
+@products_bp.route("/products/<int:id>/review", methods=["GET", "POST"])
+@login_required
+def add_review(id):
+    product = Product.query.get_or_404(id)
+
+    # Strictly check if user purchased and received the product
+    purchased_item = OrderItem.query.join(Order).filter(
+        Order.user_id == current_user.id,
+        Order.status == 'Delivered',
+        OrderItem.product_id == id
+    ).first()
+
+    if not purchased_item:
+        flash("You can only review products you have purchased and received.", "danger")
+        return redirect(url_for('products.detail', id=id))
+
+    existing_review = Review.query.filter_by(user_id=current_user.id, order_item_id=purchased_item.id).first()
+    if existing_review:
+        flash("You have already reviewed this purchase.", "warning")
+        return redirect(url_for('products.detail', id=id))
+
+    form = ReviewForm()
+    if form.validate_on_submit():
+        review = Review(
+            user_id=current_user.id,
+            product_id=product.id,
+            order_item_id=purchased_item.id,
+            rating=form.rating.data,
+            title=form.title.data,
+            comment=form.comment.data
+        )
+        db.session.add(review)
+        db.session.commit()
+        flash("Thank you for your review!", "success")
+        return redirect(url_for('products.detail', id=id))
+
+    return render_template('products/review_form.html', form=form, product=product)
+
+@products_bp.route("/wishlist")
+@login_required
+def wishlist():
+    wishlist_items = Wishlist.query.filter_by(user_id=current_user.id).all()
+    return render_template('products/wishlist.html', items=wishlist_items)
+
+@products_bp.route("/products/<int:id>/wishlist/toggle", methods=["POST"])
+@login_required
+def toggle_wishlist(id):
+    product = Product.query.get_or_404(id)
+    item = Wishlist.query.filter_by(user_id=current_user.id, product_id=id).first()
+
+    if item:
+        db.session.delete(item)
+        flash(f"{product.name} removed from wishlist.", "success")
+    else:
+        new_item = Wishlist(user_id=current_user.id, product_id=id)
+        db.session.add(new_item)
+        flash(f"{product.name} added to wishlist.", "success")
+
+    db.session.commit()
+    return redirect(request.referrer or url_for('products.detail', id=id))
 
 from app.products.utils import save_picture
 

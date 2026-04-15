@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, abort, ses
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import auth_bp
 from app.auth.forms import UserForm, LoginForm, AddressForm, ProfileForm
-from app.auth.models import User, Address
+from app.auth.models import User, Address, UserActivityLog
 from app.auth.models import User
 from app.orders.models import Order, OrderItem
 from app.products.models import Product
@@ -12,6 +12,22 @@ from app.auth.decorators import role_required, admin_required, seller_required, 
 from app.auth.constants import Roles
 from sqlalchemy import func
 import os
+import json
+
+def log_user_activity(user_id, action_type, entity_type=None, entity_id=None, metadata=None):
+    if user_id:
+        log = UserActivityLog(
+            user_id=user_id,
+            action_type=action_type,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            metadata_json=json.dumps(metadata) if metadata else None
+        )
+        db.session.add(log)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -27,6 +43,7 @@ def login():
                 return redirect(url_for('auth.login'))
                 
             login_user(user, remember=form.remember.data)
+            log_user_activity(user.id, "LOGIN", "User", user.id)
             next_page = request.args.get('next')
             flash("Logged in successfully!", "success")
             
@@ -101,6 +118,7 @@ def signup():
 @auth_bp.route("/logout")
 @login_required
 def logout():
+    log_user_activity(current_user.id, "LOGOUT", "User", current_user.id)
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for('main.index'))
@@ -402,6 +420,7 @@ def google_callback():
         return redirect(url_for('auth.login'))
         
     login_user(user)
+    log_user_activity(user.id, "LOGIN", "User", user.id)
     flash("Successfully logged in with Google!", "success")
     
     # Redirect based on role (standard logic)

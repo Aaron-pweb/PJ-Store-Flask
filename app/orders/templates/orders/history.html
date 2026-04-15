@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Order History - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Order History</h2>
+
+    {% if orders %}
+        <div class="list-group">
+            {% for order in orders %}
+            <div class="list-group-item p-4 mb-3 rounded border shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <div>
+                        <span class="text-muted small">Order Placed</span><br>
+                        <strong>{{ order.created_at.strftime('%B %d, %Y') }}</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted small">Total</span><br>
+                        <strong>${{ order.total_amount }}</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted small">Order #</span><br>
+                        <strong>{{ order.id }}</strong>
+                    </div>
+                    <div class="text-end">
+                        <a href="{{ url_for('orders.order_detail', order_id=order.id) }}" class="btn btn-outline-primary btn-sm">View Details / Track</a>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-2">
+                            Status:
+                            <span class="badge
+                                {% if order.status == 'Delivered' %}bg-success
+                                {% elif order.status == 'Shipped' %}bg-info
+                                {% elif order.status == 'Cancelled' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </h5>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {% for item in order.items %}
+                            <img src="{{ url_for('static', filename='product_pics/' + item.product.image_file) }}" alt="{{ item.product.name }}" class="rounded border p-1" style="width: 50px; height: 50px; object-fit: contain; mix-blend-mode: multiply;">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">You have no orders yet.</h4>
+            <a href="{{ url_for('products.catalog') }}" class="btn btn-primary mt-2">Start Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

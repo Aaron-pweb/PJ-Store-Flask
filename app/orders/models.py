@@ -57,3 +57,39 @@ class OrderItem(db.Model):
     variant_id = db.Column(db.Integer, nullable=True) # Link to variant (if it still exists)
 
     product = db.relationship('Product')
+
+class OrderFulfillment(db.Model):
+    __tablename__ = 'order_fulfillment'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    courier_name = db.Column(db.String(100), nullable=True)
+    tracking_number = db.Column(db.String(100), nullable=True)
+    tracking_url = db.Column(db.String(255), nullable=True)
+    estimated_delivery_date = db.Column(db.DateTime, nullable=True)
+
+    order = db.relationship('Order', backref=db.backref('fulfillment', uselist=False))
+
+class OrderEvent(db.Model):
+    __tablename__ = 'order_event'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    status_code = db.Column(db.String(50), nullable=False) # e.g. PLACED, SHIPPED, DELIVERED
+    description = db.Column(db.String(255), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    location = db.Column(db.String(100), nullable=True)
+
+    order = db.relationship('Order', backref=db.backref('events', lazy=True, order_by='OrderEvent.timestamp'))
+
+class ReturnRequest(db.Model):
+    __tablename__ = 'return_request'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reason_code = db.Column(db.String(50), nullable=False) # DEFECTIVE, WRONG_ITEM, etc.
+    description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), default='REQUESTED') # REQUESTED, APPROVED, REJECTED, RECEIVED, REFUNDED
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    resolved_at = db.Column(db.DateTime, nullable=True)
+
+    order = db.relationship('Order', backref='return_requests')
+    user = db.relationship('User', backref='return_requests')
