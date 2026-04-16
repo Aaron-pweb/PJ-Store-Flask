@@ -14,7 +14,7 @@ load_dotenv()
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = os.getenv("APP_SECRET_KEY", "dev_key")
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://db-username:{db-password}@localhost:5432/pj_store'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{os.getenv("DB_USERNAME")}:{os.getenv("POSTRE_POSSWORD")}@localhost:5432/pj_store"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
