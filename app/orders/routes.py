@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from app.extensions import db
-from app.orders.models import Cart, CartItem, Order, OrderItem
+from app.orders.models import Cart, CartItem, Order, OrderItem, OrderEvent, ReturnRequest
 from app.products.models import Product, ProductVariant
 from app.orders import orders_bp
 
@@ -74,6 +74,54 @@ def remove_from_cart(item_id):
     db.session.commit()
     flash('Item removed from cart.', 'info')
     return redirect(url_for('orders.view_cart'))
+
+@orders_bp.route('/orders/history')
+@login_required
+def order_history():
+    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template('orders/history.html', orders=orders)
+
+@orders_bp.route('/orders/<int:order_id>')
+@login_required
+def order_detail(order_id):
+    order = Order.query.get_or_404(order_id)
+    if order.user_id != current_user.id:
+        abort(403)
+    return render_template('orders/detail.html', order=order)
+
+@orders_bp.route('/orders/<int:order_id>/return', methods=['GET', 'POST'])
+@login_required
+def request_return(order_id):
+    order = Order.query.get_or_404(order_id)
+    if order.user_id != current_user.id:
+        abort(403)
+
+    if order.status != 'Delivered':
+        flash('You can only return orders that have been delivered.', 'danger')
+        return redirect(url_for('orders.order_detail', order_id=order.id))
+
+    # Check if a return already exists
+    existing_return = ReturnRequest.query.filter_by(order_id=order.id).first()
+    if existing_return:
+        flash('A return request already exists for this order.', 'info')
+        return redirect(url_for('orders.order_detail', order_id=order.id))
+
+    if request.method == 'POST':
+        reason = request.form.get('reason_code')
+        description = request.form.get('description')
+
+        return_req = ReturnRequest(
+            order_id=order.id,
+            user_id=current_user.id,
+            reason_code=reason,
+            description=description
+        )
+        db.session.add(return_req)
+        db.session.commit()
+        flash('Return request submitted successfully.', 'success')
+        return redirect(url_for('orders.order_detail', order_id=order.id))
+
+    return render_template('orders/return_form.html', order=order)
 
 @orders_bp.route('/checkout', methods=['GET', 'POST'])
 @login_required

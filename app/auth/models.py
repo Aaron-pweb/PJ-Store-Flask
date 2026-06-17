@@ -36,3 +36,15 @@ class Address(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     
     user = db.relationship('User', backref='addresses')
+
+class UserActivityLog(db.Model):
+    __tablename__ = 'user_activity_log'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    action_type = db.Column(db.String(50), nullable=False) # e.g. VIEWED_PRODUCT, SEARCHED, LOGIN
+    entity_type = db.Column(db.String(50), nullable=True) # e.g. Product, Address
+    entity_id = db.Column(db.Integer, nullable=True)
+    metadata_json = db.Column(db.Text, nullable=True) # JSON string for additional details
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    user = db.relationship('User', backref=db.backref('activity_logs', lazy='dynamic'))

@@ -22,3 +22,9 @@ class CategoryForm(FlaskForm):
     name = StringField('Category Name', validators=[DataRequired(), Length(min=2, max=50)])
     slug = StringField('Slug (URL friendly name)', validators=[DataRequired(), Length(min=2, max=50)])
     submit = SubmitField('Add Category')
+
+class ReviewForm(FlaskForm):
+    rating = IntegerField('Rating', validators=[DataRequired(), NumberRange(min=1, max=5)])
+    title = StringField('Title', validators=[Length(max=150)])
+    comment = TextAreaField('Comment')
+    submit = SubmitField('Submit Review')

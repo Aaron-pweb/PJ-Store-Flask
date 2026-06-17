@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Conversation - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 d-flex flex-column" style="height: 75vh;">
+                <!-- Chat Header -->
+                <div class="card-header bg-white p-3 d-flex align-items-center justify-content-between border-bottom">
+                    <div class="d-flex align-items-center">
+                        <a href="{{ url_for('support.messages') }}" class="btn btn-sm btn-light me-3"><i class="fas fa-arrow-left"></i></a>
+                        <div>
+                            <h6 class="mb-0 fw-bold">
+                                {% if current_user.role == 'seller' %}
+                                    {{ thread.customer.full_name }}
+                                {% else %}
+                                    {{ thread.seller.full_name }} (Seller)
+                                {% endif %}
+                            </h6>
+                            {% if thread.product %}
+                                <small class="text-muted"><a href="{{ url_for('products.detail', id=thread.product.id) }}" class="text-decoration-none">Regarding: {{ thread.product.name }}</a></small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="card-body p-4 overflow-auto bg-light flex-grow-1 d-flex flex-column gap-3" id="chatContainer">
+                    {% for message in thread.messages %}
+                        {% if message.sender_id == current_user.id %}
+                            <!-- Sent Message -->
+                            <div class="align-self-end">
+                                <div class="bg-primary text-white rounded-3 px-3 py-2 mb-1" style="max-width: 85%; border-bottom-right-radius: 4px !important;">
+                                    {{ message.content }}
+                                </div>
+                                <div class="text-end text-muted" style="font-size: 0.75rem;">
+                                    {{ message.sent_at.strftime('%I:%M %p') }}
+                                    {% if message.is_read %}
+                                        <i class="fas fa-check-double ms-1 text-primary"></i>
+                                    {% else %}
+                                        <i class="fas fa-check ms-1"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Received Message -->
+                            <div class="align-self-start">
+                                <div class="bg-white border rounded-3 px-3 py-2 mb-1 shadow-sm" style="max-width: 85%; border-bottom-left-radius: 4px !important;">
+                                    {{ message.content }}
+                                </div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ message.sent_at.strftime('%I:%M %p') }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Chat Input -->
+                <div class="card-footer bg-white p-3 border-top">
+                    <form action="" method="POST" class="d-flex gap-2 align-items-end">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="flex-grow-1">
+                            <textarea class="form-control" name="content" rows="1" placeholder="Type a message..." required style="resize: none;" id="messageInput"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary px-3"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll to bottom of chat
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // Auto-resize textarea
+    const tx = document.getElementById('messageInput');
+    tx.setAttribute('style', 'height:' + (tx.scrollHeight) + 'px;overflow-y:hidden;resize:none');
+    tx.addEventListener("input", OnInput, false);
+    function OnInput() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        if(this.value === '') {
+             this.style.height = 'auto';
+        }
+    }
+</script>
+{% endblock %}

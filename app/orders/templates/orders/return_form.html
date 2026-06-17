@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Request Return - Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="card-title fw-bold mb-0">Request Return</h2>
+                        <span class="badge bg-secondary">Order #{{ order.id }}</span>
+                    </div>
+
+                    <p class="text-muted mb-4">Please provide details about why you are returning items from this order. Note that returns are subject to seller approval.</p>
+
+                    <form method="POST" action="">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-4">
+                            <label for="reason_code" class="form-label fw-bold">Reason for Return</label>
+                            <select class="form-select" id="reason_code" name="reason_code" required>
+                                <option value="" disabled selected>Select a reason...</option>
+                                <option value="DEFECTIVE">Item is defective or damaged</option>
+                                <option value="WRONG_ITEM">Wrong item was sent</option>
+                                <option value="POOR_QUALITY">Poor quality / Not as described</option>
+                                <option value="CHANGED_MIND">Changed my mind / No longer need it</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-bold">Additional Details</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Please describe the issue in detail..." required></textarea>
+                            <div class="form-text">If the item is damaged, please describe where and how.</div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> Our support team will review your request and get back to you within 48 hours with instructions.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning px-4 fw-bold">Submit Return Request</button>
+                            <a href="{{ url_for('orders.order_detail', order_id=order.id) }}" class="btn btn-light">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

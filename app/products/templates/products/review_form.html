@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Write Review for {{ product.name }} - PJ-STORE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h2 class="card-title fw-bold mb-4">Write a Review</h2>
+
+                    <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+                        <img src="{{ url_for('static', filename='product_pics/' + product.image_file) }}" alt="{{ product.name }}" width="60" class="me-3 rounded">
+                        <div>
+                            <h5 class="mb-0">{{ product.name }}</h5>
+                            <p class="text-muted small mb-0">You purchased this item recently.</p>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.rating.label(class="form-label fw-semibold") }}
+                            {{ form.rating(class="form-control" + (" is-invalid" if form.rating.errors else ""), type="number", min="1", max="5") }}
+                            {% for error in form.rating.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Rate from 1 (Poor) to 5 (Excellent)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-semibold") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% for error in form.title.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.comment.label(class="form-label fw-semibold") }}
+                            {{ form.comment(class="form-control" + (" is-invalid" if form.comment.errors else ""), rows="4") }}
+                            {% for error in form.comment.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            {{ form.submit(class="btn btn-primary px-4") }}
+                            <a href="{{ url_for('products.detail', id=product.id) }}" class="btn btn-light">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

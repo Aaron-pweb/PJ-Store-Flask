@@ -4,21 +4,29 @@
 
 {% block content %}
 <!-- Hero Section -->
-<div class="bg-body-tertiary text-body position-relative mb-5" style="border-radius: 0 0 20px 20px; overflow: hidden;">
+<div class="bg-body-tertiary text-body position-relative mb-5 border-bottom shadow-sm" style="overflow: hidden;">
+    <!-- Abstract Background Pattern -->
+    <div class="position-absolute w-100 h-100" style="top: 0; left: 0; opacity: 0.05; background-image: radial-gradient(circle at 10px 10px, var(--bs-primary) 2px, transparent 0); background-size: 30px 30px;"></div>
     
-    <div class="container py-5">
+    <div class="container py-5 position-relative z-1">
         <div class="row align-items-center py-5">
-            <div class="col-lg-6">
-                <h1 class="display-3 fw-bold mb-3">Discover the Latest Trends</h1>
-                <p class="lead mb-4 opacity-75">Upgrade your style with our premium collection of products. Quality, comfort, and elegance in every item.</p>
+            <div class="col-lg-6 pe-lg-5">
+                <span class="badge bg-primary rounded-pill mb-3 px-3 py-2 text-uppercase tracking-wider">New Collection Arrivals</span>
+                <h1 class="display-3 fw-bold mb-3" style="line-height: 1.1;">Discover Your <span class="text-primary">Next Favorite</span> Item</h1>
+                <p class="lead mb-4 opacity-75 fw-normal">Upgrade your style with our premium collection of products. Quality, comfort, and elegance in every single piece.</p>
                 <div class="d-flex gap-3">
-                    <a href="{{ url_for('products.catalog') }}" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold">Shop Now</a>
-                    <a href="#featured" class="btn btn-outline-secondary btn-lg rounded-pill px-4">View Featured</a>
+                    <a href="{{ url_for('products.catalog') }}" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"><i class="fas fa-shopping-bag me-2"></i>Shop Now</a>
+                    <a href="#featured" class="btn btn-outline-secondary bg-white btn-lg rounded-pill px-4 shadow-sm">View Featured</a>
                 </div>
             </div>
-            <div class="col-lg-6 d-none d-lg-block text-center">
-                <!-- Hero Image Placeholder -->
-                <i class="fas fa-shopping-bag fa-10x opacity-50 text-primary"></i>
+            <div class="col-lg-6 d-none d-lg-block text-center position-relative">
+                <!-- Abstract Hero Composition Placeholder -->
+                <div class="position-relative mx-auto" style="width: 400px; height: 400px;">
+                    <div class="position-absolute bg-primary rounded-circle opacity-25" style="width: 300px; height: 300px; top: 50%; left: 50%; transform: translate(-50%, -50%); blur: 20px;"></div>
+                    <i class="fas fa-box-open fa-10x position-absolute text-primary shadow-lg bg-white rounded-circle p-5" style="top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;"></i>
+                    <i class="fas fa-tags fa-3x position-absolute text-warning shadow bg-white rounded-circle p-3" style="top: 10%; right: 10%; z-index: 3; transform: rotate(15deg);"></i>
+                    <i class="fas fa-star fa-3x position-absolute text-success shadow bg-white rounded-circle p-3" style="bottom: 15%; left: 5%; z-index: 3; transform: rotate(-10deg);"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -68,12 +76,12 @@
         {% for product in featured_products %}
         <div class="col">
             <div class="card h-100 shadow-sm border-0 product-card transition-hover">
-                <div class="position-relative overflow-hidden rounded-top">
+                <div class="position-relative overflow-hidden rounded-top bg-light">
                     <!-- Image -->
-                    <a href="{{ url_for('products.detail', id=product.id) }}">
+                    <a href="{{ url_for('products.detail', id=product.id) }}" class="d-flex justify-content-center align-items-center" style="height: 250px;">
                         <img src="{{ url_for('static', filename='product_pics/' + product.image_file) }}"
-                            class="card-img-top" alt="{{ product.name }}" 
-                            style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
+                            class="card-img-top p-3" alt="{{ product.name }}"
+                            style="max-height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform 0.3s ease;">
                     </a>
                     <!-- Badge (Optional) -->
                     {% if product.stock < 5 %}
@@ -88,11 +96,16 @@
                             {{ product.name }}
                         </a>
                     </h5>
-                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
                         <span class="h5 mb-0 text-primary fw-bold">${{ product.price }}</span>
-                        <a href="{{ url_for('orders.add_to_cart', product_id=product.id) }}" class="btn btn-light btn-sm rounded-circle shadow-sm position-relative" style="z-index: 2;" title="Add to Cart">
-                            <i class="fas fa-cart-plus text-primary"></i>
-                        </a>
+                        <!-- Direct Add to Cart Form to avoid GET request issues on cart add -->
+                        <form action="{{ url_for('orders.add_to_cart', product_id=product.id) }}" method="POST" class="position-relative" style="z-index: 2;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-light btn-sm rounded-circle shadow-sm" title="Add to Cart">
+                                <i class="fas fa-cart-plus text-primary"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -114,7 +127,20 @@
             <div class="col-6 col-md-3 text-center">
                 <a href="{{ url_for('products.catalog', category=category.name) }}" class="text-decoration-none text-dark">
                     <div class="bg-white rounded-circle shadow-sm mx-auto mb-3 d-flex align-items-center justify-content-center transition-hover" style="width: 120px; height: 120px;">
-                        <span class="h1 mb-0 text-primary">{{ category.name[0] }}</span>
+                        {% set cat_lower = category.name|lower %}
+                        {% if 'electronic' in cat_lower or 'tech' in cat_lower %}
+                            <i class="fas fa-laptop text-primary fa-3x"></i>
+                        {% elif 'cloth' in cat_lower or 'apparel' in cat_lower %}
+                            <i class="fas fa-tshirt text-primary fa-3x"></i>
+                        {% elif 'shoe' in cat_lower or 'footwear' in cat_lower %}
+                            <i class="fas fa-shoe-prints text-primary fa-3x"></i>
+                        {% elif 'book' in cat_lower %}
+                            <i class="fas fa-book text-primary fa-3x"></i>
+                        {% elif 'home' in cat_lower or 'furniture' in cat_lower %}
+                            <i class="fas fa-couch text-primary fa-3x"></i>
+                        {% else %}
+                            <i class="fas fa-tags text-primary fa-3x"></i>
+                        {% endif %}
                     </div>
                     <h5 class="fw-semibold">{{ category.name }}</h5>
                 </a>
