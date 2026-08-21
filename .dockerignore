@@ -1,0 +1,19 @@
+# Git
+.git
+.gitignore
+
+# Node dependencies
+node_modules/
+npm-debug.log
+
+# Environment variables & virtual environments
+.env
+.venv
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
